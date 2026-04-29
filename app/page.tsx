@@ -45,10 +45,10 @@ const confirmationLabels = [
 ];
 
 const workflow = [
-  ['Capture', 'Snap router or upload work order.', '01'],
-  ['Confirm', 'Verify WO, part, process, and issue.', '02'],
-  ['Report', 'Generate Engineering correction report.', '03'],
-  ['Send', 'Draft first. Confirm. Then send.', '04'],
+  ['Capture Router', 'Snap or upload work order.', 'CAPTURE'],
+  ['Confirm Data', 'Verify WO, part, process, and issue.', 'CONFIRM'],
+  ['Build Correction', 'Generate Engineering correction report.', 'REPORT'],
+  ['Send Draft', 'Draft first. Confirm. Then send.', 'SEND'],
 ];
 
 export default function Home() {
@@ -116,31 +116,28 @@ export default function Home() {
   return (
     <main className="shell">
       <section className="top-card">
-        <div className="refab-lockup" aria-label="REFAB">
-          <div><span>RE</span><strong>FAB</strong></div>
-          <small>Response in Fabrication</small>
-        </div>
+        <div className="status-dot" aria-hidden="true" />
         <div className="top-copy">
-          <p><span className="red-dot" />AI-WOC SYSTEM</p>
+          <p>REFAB AI-WOC SYSTEM</p>
           <h1>Work Order Correction</h1>
           <span>Powered by Applied Intelligence Framework</span>
+        </div>
+        <div className="icon-tile" aria-label="REFAB">
+          <span>RE</span><strong>FAB</strong>
         </div>
       </section>
 
       <section className="hero-card">
-        <div>
-          <p className="eyebrow">Standardize to Optimize</p>
-          <h2>Fix bad router data before it becomes waste.</h2>
-          <p>Capture WO, part, process, issue, and Engineering correction request in one controlled flow.</p>
-        </div>
-        <div className="hero-badge">✓</div>
+        <p className="eyebrow">Standardize to Optimize</p>
+        <h2>Fix bad router data before it becomes waste.</h2>
+        <p>Capture WO, part, process, issue, and Engineering correction request in one controlled flow.</p>
       </section>
 
-      <section className="metric-strip">
-        <article><span>Drafts</span><strong>{showDraft ? '1' : '0'}</strong></article>
-        <article><span>Ready</span><strong>{allConfirmed ? '1' : '0'}</strong></article>
-        <article><span>Sent</span><strong>0</strong></article>
-        <article><span>Mode</span><strong>WOC</strong></article>
+      <section className="stats-grid" aria-label="AI-WOC stats">
+        <article><span>Draft Requests</span><strong>{showDraft ? '1' : '0'}</strong><small>Current session</small></article>
+        <article><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>Confirmed gate</small></article>
+        <article><span>Sent Today</span><strong>0</strong><small>Live count</small></article>
+        <article><span>Mode</span><strong>WOC</strong><small>Correction flow</small></article>
       </section>
 
       <section className="workflow-card compact-card">
@@ -150,12 +147,12 @@ export default function Home() {
         </div>
         {workflow.map(([title, subtitle, tag]) => (
           <div className="workflow-row" key={title}>
-            <div className="icon-box">{tag}</div>
+            <div className="icon-box">{tag.slice(0, 1)}</div>
             <div>
               <h3>{title}</h3>
               <p>{subtitle}</p>
             </div>
-            <b>›</b>
+            <span>{tag}</span>
           </div>
         ))}
       </section>
