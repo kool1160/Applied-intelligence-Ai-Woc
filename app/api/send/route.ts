@@ -5,7 +5,18 @@ export async function POST(req: Request) {
   try {
     const { subject, emailBody, reportBody } = await req.json();
 
-    if (!subject || !emailBody || !reportBody) {
+    if (typeof subject !== 'string' || typeof emailBody !== 'string' || typeof reportBody !== 'string') {
+      return NextResponse.json(
+        { error: 'subject, emailBody, and reportBody are required.' },
+        { status: 400 }
+      );
+    }
+
+    const trimmedSubject = subject.trim();
+    const trimmedEmailBody = emailBody.trim();
+    const trimmedReportBody = reportBody.trim();
+
+    if (!trimmedSubject || !trimmedEmailBody || !trimmedReportBody) {
       return NextResponse.json(
         { error: 'subject, emailBody, and reportBody are required.' },
         { status: 400 }
@@ -24,14 +35,21 @@ export async function POST(req: Request) {
     }
 
     const resend = new Resend(apiKey);
-    const fullBody = `${emailBody}\n\n--------------------\nENGINEERING WORK ORDER CORRECTION REPORT\n--------------------\n\n${reportBody}`;
+    const fullBody = `${trimmedEmailBody}\n\n--------------------\nENGINEERING WORK ORDER CORRECTION REPORT\n--------------------\n\n${trimmedReportBody}`;
 
     const sent = await resend.emails.send({
       from,
       to,
-      subject,
+      subject: trimmedSubject,
       text: fullBody,
     });
+
+    if (sent.error) {
+      return NextResponse.json(
+        { error: 'Email provider rejected the request.' },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json({ success: true, id: sent.data?.id ?? null });
   } catch {
