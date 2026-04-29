@@ -19,6 +19,8 @@ type WocData = {
   requestedAction: string;
 };
 
+const DEFAULT_TO_EMAIL = 'Christophertroyhilton@gmail.com';
+
 const blank: WocData = {
   workOrder: '',
   partNumber: '',
@@ -45,10 +47,10 @@ const confirmationLabels = [
 ];
 
 const workflow = [
-  ['1', 'Capture Router', 'Snap or upload work order.', '#capture'],
-  ['2', 'Confirm Data', 'Verify WO, part, process, and issue.', '#data'],
-  ['3', 'Build Correction', 'Generate report and email draft.', '#issue'],
-  ['4', 'Send Request', 'Draft first. Confirm. Then send.', '#drafts'],
+  ['1', 'Capture Router', 'Snap or upload work order.'],
+  ['2', 'Extract + Confirm', 'Pull WO, part, process, and rate into clean fields.'],
+  ['3', 'Build Correction', 'Generate report and Engineering email draft.'],
+  ['4', 'Confirm + Send', 'Draft first. Confirm accuracy. Then send.'],
 ];
 
 const navItems = [
@@ -59,16 +61,118 @@ const navItems = [
   ['•••', 'More', '#more'],
 ];
 
+const issueOptions = [
+  'Incorrect Time',
+  'Missing Information',
+  'Missing Operation',
+  'Missing Fixture Callout',
+  'Wrong Routing',
+  'Missing Setup Time',
+  'Missing Grind / Finish Time',
+  'Other',
+];
+
+const priorityOptions = ['Low', 'Medium', 'High', 'Critical'];
+
+const dataFields: [keyof WocData, string][] = [
+  ['workOrder', 'Work Order Number'],
+  ['partNumber', 'Part Number'],
+  ['revision', 'Revision'],
+  ['customer', 'Customer'],
+  ['quantity', 'Quantity'],
+  ['department', 'Department'],
+  ['operation', 'Operation / Router Step'],
+  ['process', 'Process'],
+  ['currentListedRate', 'Current Listed Rate'],
+  ['observedBaseline', 'Observed Sustainable Baseline'],
+];
+
+function firstMatch(source: string, patterns: RegExp[]) {
+  for (const pattern of patterns) {
+    const match = source.match(pattern);
+    if (match?.[1]) return match[1].trim().replace(/\s+/g, ' ');
+  }
+
+  return '';
+}
+
+function cleanLine(value: string) {
+  return value.replace(/[|]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function extractRouterData(source: string, existing: WocData): WocData {
+  const text = source.replace(/\r/g, '\n');
+  const lines = text.split('\n').map(cleanLine).filter(Boolean);
+  const joined = lines.join('\n');
+
+  const workOrder = firstMatch(joined, [
+    /(?:work\s*order|workorder|wo|w\/o)\s*(?:number|no\.?|#|:)?\s*[:#-]?\s*([0-9]{4,8}[-\s]?[0-9]{2,4})/i,
+    /\b([0-9]{5,6}-[0-9]{3})\b/,
+  ]).replace(/\s+/g, '');
+
+  const partNumber = firstMatch(joined, [
+    /(?:part\s*(?:number|no\.?|#)|item\s*(?:number|no\.?|#))\s*[:#-]?\s*([A-Z0-9][A-Z0-9._/-]{3,})/i,
+    /\b([A-Z]{2,5}-[A-Z0-9._/-]{3,})\b/,
+  ]);
+
+  const revision = firstMatch(joined, [
+    /(?:rev(?:ision)?\.?)\s*[:#-]?\s*([A-Z0-9]{1,4})\b/i,
+  ]);
+
+  const customer = firstMatch(joined, [
+    /(?:customer|cust\.?)\s*[:#-]?\s*([A-Z0-9][A-Z0-9 .&/-]{2,})/i,
+  ]);
+
+  const quantity = firstMatch(joined, [
+    /(?:quantity|qty)\s*[:#-]?\s*([0-9,]+\s*(?:ea|pcs?|pieces?)?)/i,
+  ]);
+
+  const operation = firstMatch(joined, [
+    /(?:operation|op\.?|router\s*step)\s*[:#-]?\s*([0-9]{3,6}\s*[A-Z0-9 /.-]{0,28})/i,
+    /\b([0-9]{4,6}\s+[A-Z]\s+[A-Z0-9]{2,8})\b/i,
+  ]);
+
+  const process = firstMatch(joined, [
+    /(?:process|department|dept\.?)\s*[:#-]?\s*(welding|weld|wd10|l\s*wd10|fabrication|forming|laser|paint|assembly|machining|grind(?:ing)?)/i,
+    /\b(welding|weld|wd10|l\s*wd10)\b/i,
+  ]);
+
+  const currentListedRate = firstMatch(joined, [
+    /(?:rate|runtime|run\s*time|parts\s*per\s*hour|pcs\s*per\s*hour|per\s*hour)\s*[:#-]?\s*([0-9]+(?:\.[0-9]+)?\s*(?:parts|pcs|pieces|ea)?\s*(?:\/|per)?\s*(?:hr|hour)?)\b/i,
+    /\b([0-9]+(?:\.[0-9]+)?\s*(?:parts|pcs|pieces|ea)\s*(?:\/|per)\s*(?:hr|hour))\b/i,
+  ]);
+
+  const detectedDepartment = /weld|wd10/i.test(process || operation || joined)
+    ? 'Welding'
+    : existing.department;
+
+  return {
+    ...existing,
+    workOrder: workOrder || existing.workOrder,
+    partNumber: partNumber || existing.partNumber,
+    revision: revision || existing.revision,
+    customer: customer || existing.customer,
+    quantity: quantity || existing.quantity,
+    department: detectedDepartment || existing.department,
+    operation: operation || existing.operation,
+    process: process ? process.toUpperCase().replace(/\s+/g, ' ') : existing.process,
+    currentListedRate: currentListedRate || existing.currentListedRate,
+  };
+}
+
 export default function Home() {
   const [data, setData] = useState<WocData>(blank);
   const [imageUrl, setImageUrl] = useState('');
+  const [routerText, setRouterText] = useState('');
   const [showDraft, setShowDraft] = useState(false);
   const [checks, setChecks] = useState<boolean[]>(Array(5).fill(false));
   const [status, setStatus] = useState('');
   const [sending, setSending] = useState(false);
+  const [history, setHistory] = useState<string[]>([]);
 
   const setField = (field: keyof WocData, value: string) => {
     setData((current) => ({ ...current, [field]: value }));
+    setChecks(Array(5).fill(false));
   };
 
   const loadSample = () => {
@@ -88,36 +192,211 @@ export default function Home() {
       problemSummary: 'The current listed welding rate of 33 parts per hour is not obtainable or sustainable under actual production conditions.',
       requestedAction: 'Please review and update the welding runtime/rate from 33 parts per hour to a sustainable baseline of 12.5 parts per hour, or establish the correct Engineering-approved welding time.',
     });
+    setShowDraft(false);
+    setChecks(Array(5).fill(false));
+    setStatus('Sample welding time issue loaded.');
+  };
+
+  const extractData = () => {
+    if (!routerText.trim()) {
+      setStatus('Capture or upload the work order, then paste copied/OCR router text here for auto-fill. Manual entry still works.');
+      return;
+    }
+
+    setData((current) => extractRouterData(routerText, current));
+    setChecks(Array(5).fill(false));
+    setStatus('Router text extracted. Verify every field before generating the draft.');
+  };
+
+  const applyWeldingTimeTemplate = () => {
+    const currentRate = data.currentListedRate || '33 parts per hour';
+    const baseline = data.observedBaseline || '12.5 parts per hour';
+
+    setData((current) => ({
+      ...current,
+      department: current.department || 'Welding',
+      process: current.process || 'WELDING',
+      currentListedRate: current.currentListedRate || currentRate,
+      observedBaseline: current.observedBaseline || baseline,
+      issueType: 'Incorrect Time',
+      priority: 'High',
+      problemSummary: `The current listed welding rate of ${currentRate} is not obtainable or sustainable under actual production conditions. A more balanced observed baseline is ${baseline}.`,
+      requestedAction: `Please review and update the welding runtime/rate from ${currentRate} to a sustainable baseline of ${baseline}, or establish the correct Engineering-approved welding time.`,
+    }));
+    setShowDraft(false);
+    setChecks(Array(5).fill(false));
+    setStatus('Welding time correction template applied.');
   };
 
   const today = new Date().toLocaleDateString();
 
   const report = useMemo(() => {
-    return `ENGINEERING WORK ORDER CORRECTION REPORT\n\nTitle:\n${data.workOrder} / ${data.partNumber} – ${data.issueType} Correction Request\n\nCorrection Type:\n${data.issueType}\n\nPriority:\n${data.priority}\n\nPart / Work Order Information:\nWork Order Number:\n${data.workOrder}\n\nPart Number:\n${data.partNumber}\n\nRevision:\n${data.revision}\n\nCustomer:\n${data.customer}\n\nQuantity:\n${data.quantity}\n\nDepartment:\n${data.department}\n\nOperation / Router Step:\n${data.operation}\n\nProcess:\n${data.process}\n\nCurrent Work Order Condition:\n${data.currentListedRate}\n\nObserved Problem:\n${data.problemSummary}\n\nCorrected / Requested Information:\n${data.requestedAction}\n\nTime Correction Details:\nCurrent Listed Rate:\n${data.currentListedRate}\n\nObserved Sustainable Baseline:\n${data.observedBaseline}\n\nRecommended Engineering Baseline:\n${data.observedBaseline}, pending Engineering review\n\nReason for Correction:\nThe current listed rate creates an unrealistic production expectation. Based on shop-floor observation, the observed sustainable baseline is more balanced and realistic for this operation.\n\nEvidence / Basis for Correction:\nThe work order router identifies the affected operation. Shop-floor review identified the current listed rate or information as inaccurate, missing, or not sustainable.\n\nRisk if Not Corrected:\nIf the work order information is not corrected, scheduling, labor planning, costing, and production expectations may continue to be based on inaccurate data.\n\nRequested Engineering Action:\n${data.requestedAction}\n\nSubmitted By:\nChris\n\nDate:\n${today}`;
+    return `ENGINEERING WORK ORDER CORRECTION REPORT
+
+Title:
+${data.workOrder || '[WO REQUIRED]'} / ${data.partNumber || '[PART REQUIRED]'} – ${data.issueType} Correction Request
+
+Correction Type:
+${data.issueType}
+
+Priority:
+${data.priority}
+
+Part / Work Order Information:
+Work Order Number:
+${data.workOrder || '[VERIFY WORK ORDER]'}
+
+Part Number:
+${data.partNumber || '[VERIFY PART NUMBER]'}
+
+Revision:
+${data.revision || '[N/A]'}
+
+Customer:
+${data.customer || '[N/A]'}
+
+Quantity:
+${data.quantity || '[N/A]'}
+
+Department:
+${data.department || '[VERIFY DEPARTMENT]'}
+
+Operation / Router Step:
+${data.operation || '[VERIFY OPERATION]'}
+
+Process:
+${data.process || '[VERIFY PROCESS]'}
+
+Current Work Order Condition:
+${data.currentListedRate || '[CURRENT CONDITION REQUIRED]'}
+
+Observed Problem:
+${data.problemSummary || '[PROBLEM SUMMARY REQUIRED]'}
+
+Corrected / Requested Information:
+${data.requestedAction || '[REQUESTED ENGINEERING ACTION REQUIRED]'}
+
+Time Correction Details:
+Current Listed Rate:
+${data.currentListedRate || '[N/A]'}
+
+Observed Sustainable Baseline:
+${data.observedBaseline || '[N/A]'}
+
+Recommended Engineering Baseline:
+${data.observedBaseline || '[ENGINEERING REVIEW REQUIRED]'}
+
+Reason for Correction:
+The current work order information creates an inaccurate production expectation. Based on shop-floor observation, the listed information should be reviewed and corrected before it continues driving scheduling, costing, labor planning, or production expectations.
+
+Evidence / Basis for Correction:
+The affected work order/router identifies the operation listed above. Shop-floor review identified the current listed rate or information as inaccurate, missing, or not sustainable.
+
+Risk if Not Corrected:
+If the work order information is not corrected, scheduling, labor planning, costing, and production expectations may continue to be based on inaccurate data.
+
+Requested Engineering Action:
+${data.requestedAction || '[REQUESTED ENGINEERING ACTION REQUIRED]'}
+
+Submitted By:
+Chris
+
+Date:
+${today}`;
   }, [data, today]);
 
-  const emailDraft = useMemo(() => {
-    return `Subject:\nWork Order Correction Request – ${data.workOrder} / ${data.partNumber} – ${data.issueType}\n\nBody:\nEngineering Team,\n\nPlease review the work order correction request for the following:\n\nWork Order:\n${data.workOrder}\n\nPart Number:\n${data.partNumber}\n\nRevision:\n${data.revision}\n\nCustomer:\n${data.customer}\n\nOperation:\n${data.operation} – ${data.process}\n\nIssue Summary:\n${data.problemSummary}\n\nCurrent Listed Condition:\n${data.currentListedRate}\n\nObserved Sustainable Baseline / Corrected Information:\n${data.observedBaseline}\n\nRequested Correction:\n${data.requestedAction}\n\nReason for Request:\nThe current work order information creates an inaccurate production expectation and may affect scheduling, labor planning, costing, or production flow if left unchanged.\n\nPriority:\n${data.priority}\n\nThank you,\n\nChris`;
+  const emailSubject = useMemo(() => {
+    return `Work Order Correction Request – ${data.workOrder || 'WO TBD'} / ${data.partNumber || 'Part TBD'} – ${data.issueType}`;
+  }, [data.issueType, data.partNumber, data.workOrder]);
+
+  const emailBody = useMemo(() => {
+    return `Engineering Team,
+
+Please review the work order correction request below.
+
+Work Order:
+${data.workOrder || '[VERIFY WORK ORDER]'}
+
+Part Number:
+${data.partNumber || '[VERIFY PART NUMBER]'}
+
+Revision:
+${data.revision || '[N/A]'}
+
+Customer:
+${data.customer || '[N/A]'}
+
+Operation:
+${data.operation || '[VERIFY OPERATION]'} – ${data.process || '[VERIFY PROCESS]'}
+
+Issue Summary:
+${data.problemSummary || '[PROBLEM SUMMARY REQUIRED]'}
+
+Current Listed Condition:
+${data.currentListedRate || '[CURRENT CONDITION REQUIRED]'}
+
+Observed Sustainable Baseline / Corrected Information:
+${data.observedBaseline || '[N/A]'}
+
+Requested Correction:
+${data.requestedAction || '[REQUESTED ENGINEERING ACTION REQUIRED]'}
+
+Reason for Request:
+The current work order information creates an inaccurate production expectation and may affect scheduling, labor planning, costing, or production flow if left unchanged.
+
+Priority:
+${data.priority}
+
+Thank you,
+
+Chris`;
   }, [data]);
 
+  const emailDraft = useMemo(() => {
+    return `To:
+${DEFAULT_TO_EMAIL}
+
+Subject:
+${emailSubject}
+
+Body:
+${emailBody}`;
+  }, [emailBody, emailSubject]);
+
   const allConfirmed = checks.every(Boolean);
+  const readyToDraft = Boolean(data.workOrder && data.partNumber && data.operation && data.process && data.problemSummary && data.requestedAction);
 
   const copyText = async (text: string) => {
     await navigator.clipboard.writeText(text);
     setStatus('Copied.');
   };
 
+  const generateDraft = () => {
+    setShowDraft(true);
+    setChecks(Array(5).fill(false));
+    setStatus(readyToDraft ? 'Draft generated. Confirm every checkbox before sending.' : 'Draft generated with missing fields. Fill bracketed items before confirming.');
+  };
+
   const sendEmail = async () => {
     setSending(true);
     setStatus('');
-    const subject = `Work Order Correction Request – ${data.workOrder} / ${data.partNumber} – ${data.issueType}`;
+
     const res = await fetch('/api/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subject, emailBody: emailDraft, reportBody: report }),
+      body: JSON.stringify({ subject: emailSubject, emailBody, reportBody: report }),
     });
+
     const result = await res.json();
-    setStatus(result.error || 'Email sent successfully.');
+
+    if (result.error) {
+      setStatus(result.error);
+    } else {
+      const record = `${new Date().toLocaleString()} – ${data.workOrder || 'WO TBD'} / ${data.partNumber || 'Part TBD'} sent`;
+      setHistory((current) => [record, ...current].slice(0, 8));
+      setStatus('Email sent successfully.');
+    }
+
     setSending(false);
   };
 
@@ -138,7 +417,7 @@ export default function Home() {
         <div className="hero-copy">
           <p className="eyebrow">Standardize to Optimize</p>
           <h2>Fix bad router data before it becomes waste.</h2>
-          <p>Capture WO, part, process, issue, and Engineering correction request in one controlled flow.</p>
+          <p>Snap the work order, confirm the WO, part, process, and issue, then generate a controlled Engineering correction request.</p>
         </div>
         <div className="hero-emblem" aria-hidden="true">
           <div className="shield">✓</div>
@@ -149,7 +428,7 @@ export default function Home() {
       <section className="stats-grid" aria-label="AI-WOC stats">
         <article className="stat-card glow-card"><div className="stat-icon">▤</div><div><span>Draft Requests</span><strong>{showDraft ? '1' : '0'}</strong><small>Current session</small></div></article>
         <article className="stat-card glow-card"><div className="stat-icon">➤</div><div><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>Confirmed gate</small></div></article>
-        <article className="stat-card glow-card"><div className="stat-icon">▥</div><div><span>Sent Today</span><strong>0</strong><small>Live count</small></div></article>
+        <article className="stat-card glow-card"><div className="stat-icon">▥</div><div><span>Sent Today</span><strong>{history.length}</strong><small>Session count</small></div></article>
         <article className="stat-card glow-card"><div className="stat-icon">⚙</div><div><span>Mode</span><strong>WOC</strong><small>Correction flow</small></div></article>
       </section>
 
@@ -158,15 +437,15 @@ export default function Home() {
           <span />
           <h2>Correction Workflow</h2>
         </div>
-        {workflow.map(([step, title, subtitle, target]) => (
-          <a className="workflow-row" href={target} key={title}>
+        {workflow.map(([step, title, subtitle]) => (
+          <div className="workflow-row" key={title}>
             <div className="step-box">{step}</div>
             <div>
               <h3>{title}</h3>
               <p>{subtitle}</p>
             </div>
             <b>›</b>
-          </a>
+          </div>
         ))}
       </section>
 
@@ -175,17 +454,27 @@ export default function Home() {
           <p>Step 1</p>
           <h2>Capture Work Order</h2>
         </div>
+        <p className="mini-note">Use the camera/upload for evidence. For this MVP, paste copied router/OCR text below to auto-fill fields, then verify manually before sending.</p>
         <input
           type="file"
           accept="image/*"
+          capture="environment"
           onChange={(event) => {
             const file = event.target.files?.[0];
             if (file) setImageUrl(URL.createObjectURL(file));
           }}
         />
         {imageUrl ? <img className="preview" src={imageUrl} alt="Uploaded work order preview" /> : null}
+        <label>
+          Paste Router / OCR Text
+          <textarea
+            value={routerText}
+            onChange={(event) => setRouterText(event.target.value)}
+            placeholder="Paste copied text from the work order here. Example: WO 042631-001, Part CYM-1750-LH-BU, Operation 003000 L WD10, Rate 33 parts per hour..."
+          />
+        </label>
         <div className="button-row">
-          <button type="button" className="secondary" onClick={() => setStatus('OCR placeholder for MVP. Use manual entry after capturing the image.')}>
+          <button type="button" className="secondary" onClick={extractData}>
             Extract Data
           </button>
           <button type="button" onClick={loadSample}>Load Sample</button>
@@ -198,20 +487,7 @@ export default function Home() {
           <h2>Confirm Data</h2>
         </div>
         <div className="field-grid">
-          {(
-            [
-              ['workOrder', 'Work Order Number'],
-              ['partNumber', 'Part Number'],
-              ['revision', 'Revision'],
-              ['customer', 'Customer'],
-              ['quantity', 'Quantity'],
-              ['department', 'Department'],
-              ['operation', 'Operation / Router Step'],
-              ['process', 'Process'],
-              ['currentListedRate', 'Current Listed Rate'],
-              ['observedBaseline', 'Observed Sustainable Baseline'],
-            ] as [keyof WocData, string][]
-          ).map(([field, label]) => (
+          {dataFields.map(([field, label]) => (
             <label key={field}>
               {label}
               <input value={data[field]} onChange={(event) => setField(field, event.target.value)} />
@@ -225,16 +501,21 @@ export default function Home() {
           <p>Step 3</p>
           <h2>State Issue</h2>
         </div>
+        <div className="template-card">
+          <strong>Fast template</strong>
+          <p>Use this for the current welding time issue: listed at 33/hour, observed balanced baseline at 12.5/hour.</p>
+          <button type="button" className="secondary" onClick={applyWeldingTimeTemplate}>Apply Welding Time Issue</button>
+        </div>
         <label>
           Issue Type
           <select value={data.issueType} onChange={(event) => setField('issueType', event.target.value)}>
-            {['Incorrect Time', 'Missing Information', 'Missing Operation', 'Missing Fixture Callout', 'Wrong Routing', 'Missing Setup Time', 'Missing Grind / Finish Time', 'Other'].map((item) => <option key={item}>{item}</option>)}
+            {issueOptions.map((item) => <option key={item}>{item}</option>)}
           </select>
         </label>
         <label>
           Priority
           <select value={data.priority} onChange={(event) => setField('priority', event.target.value)}>
-            {['Low', 'Medium', 'High', 'Critical'].map((item) => <option key={item}>{item}</option>)}
+            {priorityOptions.map((item) => <option key={item}>{item}</option>)}
           </select>
         </label>
         <label>
@@ -245,7 +526,7 @@ export default function Home() {
           Requested Engineering Action
           <textarea value={data.requestedAction} onChange={(event) => setField('requestedAction', event.target.value)} />
         </label>
-        <button type="button" onClick={() => setShowDraft(true)}>Generate Report + Email Draft</button>
+        <button type="button" onClick={generateDraft}>Generate Report + Email Draft</button>
       </section>
 
       <section className="panel glow-card draft-panel" id="drafts">
@@ -255,6 +536,9 @@ export default function Home() {
         </div>
         {showDraft ? (
           <>
+            <div className={readyToDraft ? 'gate good' : 'gate warn'}>
+              {readyToDraft ? 'Core fields complete. Confirm accuracy before sending.' : 'Some core fields are missing. Fill any bracketed items before confirming.'}
+            </div>
             <h3>Correction Report</h3>
             <pre>{report}</pre>
             <h3>Email Draft</h3>
@@ -285,7 +569,13 @@ export default function Home() {
           <p>History</p>
           <h2>Submission History</h2>
         </div>
-        <p>Sent requests will appear here after email delivery is connected and tracking is added.</p>
+        {history.length ? (
+          <ul className="history-list">
+            {history.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        ) : (
+          <p>Sent requests will appear here after email delivery is connected and tracking is added.</p>
+        )}
       </section>
 
       <section className="panel glow-card compact-info" id="more">
@@ -294,6 +584,7 @@ export default function Home() {
           <h2>REFAB Connect</h2>
         </div>
         <p>Work Order Correction powered by Applied Intelligence Framework. Draft first. Confirm accuracy. Then send.</p>
+        <p className="mini-note">Default Engineering recipient: {DEFAULT_TO_EMAIL}</p>
       </section>
 
       <nav className="bottom-nav" aria-label="AI-WOC navigation">
