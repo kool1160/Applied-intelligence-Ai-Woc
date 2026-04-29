@@ -1,10 +1,52 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
+const sectionLabels = [
+  'Title',
+  'Correction Type',
+  'Priority',
+  'Part / Work Order Information',
+  'Work Order Number',
+  'Part Number',
+  'Revision',
+  'Customer',
+  'Quantity',
+  'Department',
+  'Operation / Router Step',
+  'Process',
+  'Current Work Order Condition',
+  'Observed Problem',
+  'Corrected / Requested Information',
+  'Time Correction Details',
+  'Current Listed Rate',
+  'Observed Sustainable Baseline',
+  'Recommended Engineering Baseline',
+  'Reason for Correction',
+  'Evidence / Basis for Correction',
+  'Risk if Not Corrected',
+  'Requested Engineering Action',
+  'Submitted By',
+  'Date',
+];
+
 function sectionValue(source: string, label: string) {
-  const pattern = new RegExp(`${label}:\\s*\\n?([\\s\\S]*?)(?=\\n\\n[A-Z][A-Za-z /]+:|\\n\\n[A-Z][A-Za-z /]+ \\/ [A-Za-z /]+:|$)`, 'i');
-  const match = source.match(pattern);
-  return match?.[1]?.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim() || '';
+  const lines = source.replace(/\r/g, '').split('\n');
+  const normalizedLabels = new Set(sectionLabels.map((item) => `${item}:`.toLowerCase()));
+  const target = `${label}:`.toLowerCase();
+  const startIndex = lines.findIndex((line) => line.trim().toLowerCase() === target);
+
+  if (startIndex === -1) return '';
+
+  const values: string[] = [];
+
+  for (let index = startIndex + 1; index < lines.length; index += 1) {
+    const trimmed = lines[index].trim();
+
+    if (normalizedLabels.has(trimmed.toLowerCase())) break;
+    if (trimmed) values.push(trimmed);
+  }
+
+  return values.join(' ').replace(/\s+/g, ' ').trim();
 }
 
 function compactValue(value: string, fallback = 'Not provided') {
@@ -12,23 +54,25 @@ function compactValue(value: string, fallback = 'Not provided') {
   return cleaned || fallback;
 }
 
-function buildOnePageEmail(subject: string, emailBody: string, reportBody: string) {
-  const combined = `${emailBody}\n\n${reportBody}`;
+function fromReport(reportBody: string, label: string, fallbackLabel?: string) {
+  return sectionValue(reportBody, label) || (fallbackLabel ? sectionValue(reportBody, fallbackLabel) : '');
+}
 
-  const workOrder = compactValue(sectionValue(combined, 'Work Order') || sectionValue(combined, 'Work Order Number'));
-  const partNumber = compactValue(sectionValue(combined, 'Part Number'));
-  const revision = compactValue(sectionValue(combined, 'Revision'), 'N/A');
-  const customer = compactValue(sectionValue(combined, 'Customer'), 'N/A');
-  const quantity = compactValue(sectionValue(combined, 'Quantity'), 'N/A');
-  const department = compactValue(sectionValue(combined, 'Department'), 'N/A');
-  const operation = compactValue(sectionValue(combined, 'Operation') || sectionValue(combined, 'Operation / Router Step'));
-  const process = compactValue(sectionValue(combined, 'Process'), 'N/A');
-  const issue = compactValue(sectionValue(combined, 'Issue Summary') || sectionValue(combined, 'Observed Problem'));
-  const current = compactValue(sectionValue(combined, 'Current Listed Condition') || sectionValue(combined, 'Current Listed Rate') || sectionValue(combined, 'Current Work Order Condition'));
-  const observed = compactValue(sectionValue(combined, 'Observed Sustainable Baseline / Corrected Information') || sectionValue(combined, 'Observed Sustainable Baseline'), 'N/A');
-  const requested = compactValue(sectionValue(combined, 'Requested Correction') || sectionValue(combined, 'Requested Engineering Action'));
-  const priority = compactValue(sectionValue(combined, 'Priority'), 'N/A');
-  const date = compactValue(sectionValue(combined, 'Date'), new Date().toLocaleDateString('en-US'));
+function buildOnePageEmail(subject: string, reportBody: string) {
+  const workOrder = compactValue(fromReport(reportBody, 'Work Order Number'));
+  const partNumber = compactValue(fromReport(reportBody, 'Part Number'));
+  const revision = compactValue(fromReport(reportBody, 'Revision'), 'N/A');
+  const customer = compactValue(fromReport(reportBody, 'Customer'), 'N/A');
+  const quantity = compactValue(fromReport(reportBody, 'Quantity'), 'N/A');
+  const department = compactValue(fromReport(reportBody, 'Department'), 'N/A');
+  const operation = compactValue(fromReport(reportBody, 'Operation / Router Step'));
+  const process = compactValue(fromReport(reportBody, 'Process'), 'N/A');
+  const issue = compactValue(fromReport(reportBody, 'Observed Problem'));
+  const current = compactValue(fromReport(reportBody, 'Current Listed Rate', 'Current Work Order Condition'));
+  const observed = compactValue(fromReport(reportBody, 'Observed Sustainable Baseline'), 'N/A');
+  const requested = compactValue(fromReport(reportBody, 'Requested Engineering Action'));
+  const priority = compactValue(fromReport(reportBody, 'Priority'), 'N/A');
+  const date = compactValue(fromReport(reportBody, 'Date'), new Date().toLocaleDateString('en-US'));
 
   return `Engineering Team,
 
@@ -96,7 +140,7 @@ export async function POST(req: Request) {
     }
 
     const resend = new Resend(apiKey);
-    const onePageBody = buildOnePageEmail(trimmedSubject, trimmedEmailBody, trimmedReportBody);
+    const onePageBody = buildOnePageEmail(trimmedSubject, trimmedReportBody);
 
     const sent = await resend.emails.send({
       from,
