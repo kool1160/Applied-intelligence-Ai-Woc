@@ -1,0 +1,273 @@
+/* Focused responsive polish for AI-WOC / REFAB Connect.
+   Purpose: keep iPhone compact, make iPad feel intentional, and normalize icon centering. */
+
+.shell {
+  padding-bottom: 124px;
+}
+
+/* Compact phone dock: the dock should help navigation, not eat the screen. */
+.bottom-nav {
+  left: 14px;
+  right: 14px;
+  bottom: max(8px, calc(env(safe-area-inset-bottom) + 6px));
+  max-width: 620px;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 26px;
+}
+
+.bottom-nav::before {
+  inset: -10px -8px -12px;
+  border-radius: 34px;
+  filter: blur(8px);
+}
+
+.bottom-nav a {
+  gap: 2px;
+  min-height: 52px;
+  padding: 5px 2px 4px;
+  border-radius: 18px;
+  font-size: 10.5px;
+  line-height: 1.05;
+}
+
+.nav-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  font-size: 0;
+  line-height: 1;
+}
+
+.nav-icon::before {
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.bottom-nav a:nth-child(1) .nav-icon::before { content: '⌂'; }
+.bottom-nav a:nth-child(2) .nav-icon::before { content: '◉'; }
+.bottom-nav a:nth-child(3) .nav-icon::before { content: '▣'; }
+.bottom-nav a:nth-child(4) .nav-icon::before { content: '◷'; }
+.bottom-nav a:nth-child(5) .nav-icon::before { content: '⚙'; }
+
+.bottom-nav .active::after {
+  width: 5px;
+  height: 5px;
+}
+
+.status {
+  bottom: 82px;
+}
+
+/* Tinted, iOS-like icon containers. Keep glyphs optically centered. */
+.glass-icon-tile,
+.nav-icon,
+.stat-icon,
+.step-box {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  line-height: 1;
+}
+
+.capture-trigger {
+  align-items: center;
+  min-height: 82px;
+  padding: 13px 14px;
+}
+
+.capture-trigger > .glass-icon-tile {
+  position: relative;
+  flex: 0 0 54px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 0;
+  line-height: 1;
+}
+
+.capture-trigger > .glass-icon-tile::before {
+  content: '◉';
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: currentColor;
+  font-size: 24px;
+  line-height: 1;
+  transform: translateY(-0.5px);
+}
+
+.capture-trigger strong,
+.capture-trigger small {
+  line-height: 1.2;
+}
+
+@media (max-width: 620px) {
+  .shell {
+    padding-bottom: 122px;
+  }
+
+  .bottom-nav {
+    left: 12px;
+    right: 12px;
+    padding: 6px;
+    gap: 3px;
+    border-radius: 24px;
+  }
+
+  .bottom-nav a {
+    min-height: 50px;
+    padding: 5px 1px 4px;
+    border-radius: 17px;
+    font-size: 10px;
+  }
+
+  .nav-icon {
+    width: 27px;
+    height: 27px;
+  }
+
+  .nav-icon::before {
+    font-size: 15px;
+  }
+
+  .status {
+    bottom: 78px;
+  }
+}
+
+@media (max-width: 390px) {
+  .bottom-nav {
+    left: 10px;
+    right: 10px;
+    padding: 5px;
+  }
+
+  .bottom-nav a {
+    min-height: 46px;
+    font-size: 9.5px;
+  }
+
+  .nav-icon {
+    width: 25px;
+    height: 25px;
+  }
+
+  .nav-icon::before {
+    font-size: 14px;
+  }
+}
+
+/* iPad/tablet composition: still mobile-first, but no longer a stretched phone column. */
+@media (min-width: 768px) {
+  .shell {
+    max-width: 1060px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 20px;
+    padding: 18px 22px 126px;
+  }
+
+  .top-card,
+  .hero-card,
+  .stats-grid,
+  .draft-panel {
+    grid-column: 1 / -1;
+  }
+
+  .top-card,
+  .hero-card,
+  .stats-grid,
+  .workflow-card,
+  .panel {
+    margin: 0;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .stat-card {
+    min-height: 118px;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 17px;
+    font-size: 24px;
+  }
+
+  .stats-grid span {
+    font-size: 16px;
+  }
+
+  .stats-grid strong {
+    font-size: 42px;
+  }
+
+  .stats-grid small {
+    font-size: 13px;
+  }
+
+  .workflow-card {
+    grid-column: 1;
+  }
+
+  .capture-panel {
+    grid-column: 2;
+  }
+
+  #data {
+    grid-column: 1;
+  }
+
+  #issue {
+    grid-column: 2;
+  }
+
+  #history {
+    grid-column: 1;
+  }
+
+  #more {
+    grid-column: 2;
+  }
+
+  .field-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 14px;
+  }
+
+  .hero-card {
+    min-height: 260px;
+  }
+
+  .bottom-nav {
+    max-width: 650px;
+    left: 50%;
+    right: auto;
+    width: min(650px, calc(100vw - 44px));
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    max-width: 1160px;
+    gap: 22px;
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .hero-card h2 {
+    font-size: clamp(50px, 6vw, 68px);
+  }
+}

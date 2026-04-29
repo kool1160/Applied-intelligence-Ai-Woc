@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import './woc.css';
+import './responsive-polish.css';
 
 export const metadata: Metadata = {
   title: 'REFAB Connect',
