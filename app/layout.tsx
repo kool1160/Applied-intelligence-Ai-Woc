@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'REFAB Connect',
   description: 'Work Order Correction powered by Applied Intelligence Framework',
   applicationName: 'REFAB Connect',
-  manifest: '/manifest.json',
+  manifest: '/site.webmanifest',
   appleWebApp: {
     capable: true,
     title: 'REFAB Connect',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#020814',
+  themeColor: '#0b0c0f',
   viewportFit: 'cover',
 };
 
