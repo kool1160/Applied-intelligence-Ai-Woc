@@ -1,0 +1,25 @@
+{
+  "name": "REFAB Connect",
+  "short_name": "REFAB Connect",
+  "description": "Work Order Correction powered by Applied Intelligence Framework",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020814",
+  "theme_color": "#020814",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
