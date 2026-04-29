@@ -44,6 +44,13 @@ const confirmationLabels = [
   'I confirm the email draft is ready to send.',
 ];
 
+const workflow = [
+  ['Capture Router', 'Snap or upload work order.', 'CAPTURE'],
+  ['Confirm Data', 'Verify WO, part, process, and issue.', 'CONFIRM'],
+  ['Build Correction', 'Generate report and email draft.', 'REPORT'],
+  ['Email Engineering', 'Draft first. Confirm. Then send.', 'SEND'],
+];
+
 export default function Home() {
   const [data, setData] = useState<WocData>(blank);
   const [imageUrl, setImageUrl] = useState('');
@@ -107,15 +114,54 @@ export default function Home() {
   };
 
   return (
-    <main className="container">
-      <section className="hero">
-        <p className="eyebrow">Applied Intelligence</p>
-        <h1>AI-WOC Lite</h1>
-        <p>Snap → Extract → Confirm → Issue → Generate Draft → Confirm → Send</p>
+    <main className="shell">
+      <section className="brand-card">
+        <div className="refab-mark" aria-label="REFAB">
+          <span>RE</span><strong>FAB</strong>
+          <small>Response in Fabrication</small>
+        </div>
+        <div className="brand-divider" />
+        <div className="system-title">
+          <p><span className="red-dot" />AI-WOC SYSTEM</p>
+          <h1>Work Order Correction</h1>
+          <span>Powered by Applied Intelligence Framework</span>
+        </div>
       </section>
 
-      <section className="card">
-        <h2>1. Capture Work Order</h2>
+      <section className="mission-card">
+        <div>
+          <h2>Correct the work order before it causes waste.</h2>
+          <p>Capture part numbers, work order details, and send Engineering correction requests fast.</p>
+        </div>
+        <div className="orbit-check">✓</div>
+      </section>
+
+      <section className="stats-grid">
+        <article><span>Draft Requests</span><strong>1</strong><small>sample loaded</small></article>
+        <article><span>Pending Confirmation</span><strong>{showDraft ? '1' : '0'}</strong><small>draft gate</small></article>
+        <article><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>confirmed</small></article>
+        <article><span>Sent Today</span><strong>0</strong><small>test mode</small></article>
+      </section>
+
+      <section className="workflow-card">
+        <h2>Correction Workflow</h2>
+        {workflow.map(([title, subtitle, tag], index) => (
+          <div className="workflow-row" key={title}>
+            <div className="icon-box">{index + 1}</div>
+            <div>
+              <h3>{title}</h3>
+              <p>{subtitle}</p>
+            </div>
+            <span>{tag}</span>
+          </div>
+        ))}
+      </section>
+
+      <section className="panel capture-panel">
+        <div className="panel-heading">
+          <p>Step 1</p>
+          <h2>Capture Work Order</h2>
+        </div>
         <input
           type="file"
           accept="image/*"
@@ -125,37 +171,47 @@ export default function Home() {
           }}
         />
         {imageUrl ? <img className="preview" src={imageUrl} alt="Uploaded work order preview" /> : null}
-        <button type="button" className="secondary" onClick={() => setStatus('OCR placeholder for MVP. Use manual entry after capturing the image.')}>
-          Extract Work Order Data
-        </button>
-        <button type="button" onClick={loadSample}>Load Sample WOC</button>
+        <div className="button-row">
+          <button type="button" className="secondary" onClick={() => setStatus('OCR placeholder for MVP. Use manual entry after capturing the image.')}>
+            Extract Data
+          </button>
+          <button type="button" onClick={loadSample}>Load Sample</button>
+        </div>
       </section>
 
-      <section className="card">
-        <h2>2. Confirm Data</h2>
-        {(
-          [
-            ['workOrder', 'Work Order Number'],
-            ['partNumber', 'Part Number'],
-            ['revision', 'Revision'],
-            ['customer', 'Customer'],
-            ['quantity', 'Quantity'],
-            ['department', 'Department'],
-            ['operation', 'Operation / Router Step'],
-            ['process', 'Process'],
-            ['currentListedRate', 'Current Listed Rate'],
-            ['observedBaseline', 'Observed Sustainable Baseline'],
-          ] as [keyof WocData, string][]
-        ).map(([field, label]) => (
-          <label key={field}>
-            {label}
-            <input value={data[field]} onChange={(event) => setField(field, event.target.value)} />
-          </label>
-        ))}
+      <section className="panel">
+        <div className="panel-heading">
+          <p>Step 2</p>
+          <h2>Confirm Work Order Data</h2>
+        </div>
+        <div className="field-grid">
+          {(
+            [
+              ['workOrder', 'Work Order Number'],
+              ['partNumber', 'Part Number'],
+              ['revision', 'Revision'],
+              ['customer', 'Customer'],
+              ['quantity', 'Quantity'],
+              ['department', 'Department'],
+              ['operation', 'Operation / Router Step'],
+              ['process', 'Process'],
+              ['currentListedRate', 'Current Listed Rate'],
+              ['observedBaseline', 'Observed Sustainable Baseline'],
+            ] as [keyof WocData, string][]
+          ).map(([field, label]) => (
+            <label key={field}>
+              {label}
+              <input value={data[field]} onChange={(event) => setField(field, event.target.value)} />
+            </label>
+          ))}
+        </div>
       </section>
 
-      <section className="card">
-        <h2>3. State Issue</h2>
+      <section className="panel">
+        <div className="panel-heading">
+          <p>Step 3</p>
+          <h2>State the Issue</h2>
+        </div>
         <label>
           Issue Type
           <select value={data.issueType} onChange={(event) => setField('issueType', event.target.value)}>
@@ -180,8 +236,11 @@ export default function Home() {
       </section>
 
       {showDraft ? (
-        <section className="card">
-          <h2>4. Draft + Confirm</h2>
+        <section className="panel draft-panel">
+          <div className="panel-heading">
+            <p>Step 4</p>
+            <h2>Draft First. Confirm. Then Send.</h2>
+          </div>
           <h3>Correction Report</h3>
           <pre>{report}</pre>
           <h3>Email Draft</h3>
@@ -199,6 +258,13 @@ export default function Home() {
           <button type="button" disabled={!allConfirmed || sending} onClick={sendEmail}>{sending ? 'Sending...' : 'Send Email'}</button>
         </section>
       ) : null}
+
+      <nav className="bottom-nav" aria-label="AI-WOC navigation">
+        {['Home', 'Capture', 'Drafts', 'History', 'More'].map((item, index) => (
+          <span className={index === 0 ? 'active' : ''} key={item}>{item}</span>
+        ))}
+      </nav>
+
       {status ? <p className="status">{status}</p> : null}
     </main>
   );
