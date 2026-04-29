@@ -45,10 +45,18 @@ const confirmationLabels = [
 ];
 
 const workflow = [
-  ['Capture Router', 'Snap or upload work order.', 'CAPTURE'],
-  ['Confirm Data', 'Verify WO, part, process, and issue.', 'CONFIRM'],
-  ['Build Correction', 'Generate Engineering correction report.', 'REPORT'],
-  ['Send Draft', 'Draft first. Confirm. Then send.', 'SEND'],
+  ['1', 'Capture Router', 'Snap or upload work order.', '#capture'],
+  ['2', 'Confirm Data', 'Verify WO, part, process, and issue.', '#data'],
+  ['3', 'Build Correction', 'Generate report and email draft.', '#issue'],
+  ['4', 'Send Request', 'Draft first. Confirm. Then send.', '#drafts'],
+];
+
+const navItems = [
+  ['⌂', 'Home', '#home'],
+  ['▣', 'Capture', '#capture'],
+  ['▤', 'Drafts', '#drafts'],
+  ['◷', 'History', '#history'],
+  ['•••', 'More', '#more'],
 ];
 
 export default function Home() {
@@ -114,50 +122,55 @@ export default function Home() {
   };
 
   return (
-    <main className="shell">
-      <section className="top-card">
-        <div className="status-dot" aria-hidden="true" />
+    <main className="shell" id="home">
+      <section className="top-card glow-card">
+        <div className="brand-tile" aria-label="REFAB Connect icon">
+          <img src="/apple-touch-icon.png" alt="REFAB Connect" />
+        </div>
         <div className="top-copy">
-          <p>REFAB AI-WOC SYSTEM</p>
-          <h1>Work Order Correction</h1>
+          <h1>Work Order<br />Correction</h1>
           <span>Powered by Applied Intelligence Framework</span>
         </div>
-        <div className="icon-tile" aria-label="REFAB">
-          <span>RE</span><strong>FAB</strong>
-        </div>
+        <div className="system-pill"><span />AI-WOC SYSTEM</div>
       </section>
 
-      <section className="hero-card">
-        <p className="eyebrow">Standardize to Optimize</p>
-        <h2>Fix bad router data before it becomes waste.</h2>
-        <p>Capture WO, part, process, issue, and Engineering correction request in one controlled flow.</p>
+      <section className="hero-card glow-card">
+        <div className="hero-copy">
+          <p className="eyebrow">Standardize to Optimize</p>
+          <h2>Fix bad router data before it becomes waste.</h2>
+          <p>Capture WO, part, process, issue, and Engineering correction request in one controlled flow.</p>
+        </div>
+        <div className="hero-emblem" aria-hidden="true">
+          <div className="shield">✓</div>
+          <div className="rings" />
+        </div>
       </section>
 
       <section className="stats-grid" aria-label="AI-WOC stats">
-        <article><span>Draft Requests</span><strong>{showDraft ? '1' : '0'}</strong><small>Current session</small></article>
-        <article><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>Confirmed gate</small></article>
-        <article><span>Sent Today</span><strong>0</strong><small>Live count</small></article>
-        <article><span>Mode</span><strong>WOC</strong><small>Correction flow</small></article>
+        <article className="stat-card glow-card"><div className="stat-icon">▤</div><div><span>Draft Requests</span><strong>{showDraft ? '1' : '0'}</strong><small>Current session</small></div></article>
+        <article className="stat-card glow-card"><div className="stat-icon">➤</div><div><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>Confirmed gate</small></div></article>
+        <article className="stat-card glow-card"><div className="stat-icon">▥</div><div><span>Sent Today</span><strong>0</strong><small>Live count</small></div></article>
+        <article className="stat-card glow-card"><div className="stat-icon">⚙</div><div><span>Mode</span><strong>WOC</strong><small>Correction flow</small></div></article>
       </section>
 
-      <section className="workflow-card compact-card">
+      <section className="workflow-card compact-card glow-card">
         <div className="section-title">
           <span />
           <h2>Correction Workflow</h2>
         </div>
-        {workflow.map(([title, subtitle, tag]) => (
-          <div className="workflow-row" key={title}>
-            <div className="icon-box">{tag.slice(0, 1)}</div>
+        {workflow.map(([step, title, subtitle, target]) => (
+          <a className="workflow-row" href={target} key={title}>
+            <div className="step-box">{step}</div>
             <div>
               <h3>{title}</h3>
               <p>{subtitle}</p>
             </div>
-            <span>{tag}</span>
-          </div>
+            <b>›</b>
+          </a>
         ))}
       </section>
 
-      <section className="panel capture-panel" id="capture">
+      <section className="panel glow-card capture-panel" id="capture">
         <div className="panel-heading">
           <p>Step 1</p>
           <h2>Capture Work Order</h2>
@@ -179,7 +192,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="panel">
+      <section className="panel glow-card" id="data">
         <div className="panel-heading">
           <p>Step 2</p>
           <h2>Confirm Data</h2>
@@ -207,7 +220,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="panel">
+      <section className="panel glow-card" id="issue">
         <div className="panel-heading">
           <p>Step 3</p>
           <h2>State Issue</h2>
@@ -235,33 +248,60 @@ export default function Home() {
         <button type="button" onClick={() => setShowDraft(true)}>Generate Report + Email Draft</button>
       </section>
 
-      {showDraft ? (
-        <section className="panel draft-panel">
-          <div className="panel-heading">
-            <p>Step 4</p>
-            <h2>Draft. Confirm. Send.</h2>
+      <section className="panel glow-card draft-panel" id="drafts">
+        <div className="panel-heading">
+          <p>Step 4</p>
+          <h2>{showDraft ? 'Draft. Confirm. Send.' : 'Drafts'}</h2>
+        </div>
+        {showDraft ? (
+          <>
+            <h3>Correction Report</h3>
+            <pre>{report}</pre>
+            <h3>Email Draft</h3>
+            <pre>{emailDraft}</pre>
+            {confirmationLabels.map((label, index) => (
+              <label className="check" key={label}>
+                <input type="checkbox" checked={checks[index]} onChange={(event) => setChecks((current) => current.map((value, i) => i === index ? event.target.checked : value))} />
+                {label}
+              </label>
+            ))}
+            <div className="button-row">
+              <button type="button" className="secondary" onClick={() => copyText(report)}>Copy Report</button>
+              <button type="button" className="secondary" onClick={() => copyText(emailDraft)}>Copy Email</button>
+            </div>
+            <button type="button" disabled={!allConfirmed || sending} onClick={sendEmail}>{sending ? 'Sending...' : 'Send Email'}</button>
+          </>
+        ) : (
+          <div className="empty-state">
+            <strong>No active draft yet.</strong>
+            <p>Complete the issue fields and generate the correction report to review the email draft here.</p>
+            <a href="#issue">Build Correction</a>
           </div>
-          <h3>Correction Report</h3>
-          <pre>{report}</pre>
-          <h3>Email Draft</h3>
-          <pre>{emailDraft}</pre>
-          {confirmationLabels.map((label, index) => (
-            <label className="check" key={label}>
-              <input type="checkbox" checked={checks[index]} onChange={(event) => setChecks((current) => current.map((value, i) => i === index ? event.target.checked : value))} />
-              {label}
-            </label>
-          ))}
-          <div className="button-row">
-            <button type="button" className="secondary" onClick={() => copyText(report)}>Copy Report</button>
-            <button type="button" className="secondary" onClick={() => copyText(emailDraft)}>Copy Email</button>
-          </div>
-          <button type="button" disabled={!allConfirmed || sending} onClick={sendEmail}>{sending ? 'Sending...' : 'Send Email'}</button>
-        </section>
-      ) : null}
+        )}
+      </section>
+
+      <section className="panel glow-card compact-info" id="history">
+        <div className="panel-heading">
+          <p>History</p>
+          <h2>Submission History</h2>
+        </div>
+        <p>Sent requests will appear here after email delivery is connected and tracking is added.</p>
+      </section>
+
+      <section className="panel glow-card compact-info" id="more">
+        <div className="panel-heading">
+          <p>System</p>
+          <h2>REFAB Connect</h2>
+        </div>
+        <p>Work Order Correction powered by Applied Intelligence Framework. Draft first. Confirm accuracy. Then send.</p>
+      </section>
 
       <nav className="bottom-nav" aria-label="AI-WOC navigation">
-        {['Home', 'Capture', 'Drafts', 'History', 'More'].map((item, index) => (
-          <a className={index === 0 ? 'active' : ''} href={index === 1 ? '#capture' : '#'} key={item}>{item}</a>
+        {navItems.map(([icon, item, target], index) => (
+          <a className={index === 0 ? 'active' : ''} href={target} key={item}>
+            <span className="nav-icon">{icon}</span>
+            <span>{item}</span>
+          </a>
         ))}
       </nav>
 
