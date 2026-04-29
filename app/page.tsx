@@ -47,8 +47,8 @@ const confirmationLabels = [
 const workflow = [
   ['Capture Router', 'Snap or upload work order.', 'CAPTURE'],
   ['Confirm Data', 'Verify WO, part, process, and issue.', 'CONFIRM'],
-  ['Build Correction', 'Generate report and email draft.', 'REPORT'],
-  ['Email Engineering', 'Draft first. Confirm. Then send.', 'SEND'],
+  ['Build Correction', 'Generate Engineering correction report.', 'REPORT'],
+  ['Send Draft', 'Draft first. Confirm. Then send.', 'SEND'],
 ];
 
 export default function Home() {
@@ -115,39 +115,39 @@ export default function Home() {
 
   return (
     <main className="shell">
-      <section className="brand-card">
-        <div className="refab-mark" aria-label="REFAB">
-          <span>RE</span><strong>FAB</strong>
-          <small>Response in Fabrication</small>
-        </div>
-        <div className="brand-divider" />
-        <div className="system-title">
-          <p><span className="red-dot" />AI-WOC SYSTEM</p>
+      <section className="top-card">
+        <div className="status-dot" aria-hidden="true" />
+        <div className="top-copy">
+          <p>REFAB AI-WOC SYSTEM</p>
           <h1>Work Order Correction</h1>
           <span>Powered by Applied Intelligence Framework</span>
         </div>
-      </section>
-
-      <section className="mission-card">
-        <div>
-          <h2>Correct the work order before it causes waste.</h2>
-          <p>Capture part numbers, work order details, and send Engineering correction requests fast.</p>
+        <div className="icon-tile" aria-label="REFAB">
+          <span>RE</span><strong>FAB</strong>
         </div>
-        <div className="orbit-check">✓</div>
       </section>
 
-      <section className="stats-grid">
-        <article><span>Draft Requests</span><strong>1</strong><small>sample loaded</small></article>
-        <article><span>Pending Confirmation</span><strong>{showDraft ? '1' : '0'}</strong><small>draft gate</small></article>
-        <article><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>confirmed</small></article>
-        <article><span>Sent Today</span><strong>0</strong><small>test mode</small></article>
+      <section className="hero-card">
+        <p className="eyebrow">Standardize to Optimize</p>
+        <h2>Fix bad router data before it becomes waste.</h2>
+        <p>Capture WO, part, process, issue, and Engineering correction request in one controlled flow.</p>
       </section>
 
-      <section className="workflow-card">
-        <h2>Correction Workflow</h2>
-        {workflow.map(([title, subtitle, tag], index) => (
+      <section className="stats-grid" aria-label="AI-WOC stats">
+        <article><span>Draft Requests</span><strong>{showDraft ? '1' : '0'}</strong><small>Current session</small></article>
+        <article><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>Confirmed gate</small></article>
+        <article><span>Sent Today</span><strong>0</strong><small>Live count</small></article>
+        <article><span>Mode</span><strong>WOC</strong><small>Correction flow</small></article>
+      </section>
+
+      <section className="workflow-card compact-card">
+        <div className="section-title">
+          <span />
+          <h2>Correction Workflow</h2>
+        </div>
+        {workflow.map(([title, subtitle, tag]) => (
           <div className="workflow-row" key={title}>
-            <div className="icon-box">{index + 1}</div>
+            <div className="icon-box">{tag.slice(0, 1)}</div>
             <div>
               <h3>{title}</h3>
               <p>{subtitle}</p>
@@ -157,7 +157,7 @@ export default function Home() {
         ))}
       </section>
 
-      <section className="panel capture-panel">
+      <section className="panel capture-panel" id="capture">
         <div className="panel-heading">
           <p>Step 1</p>
           <h2>Capture Work Order</h2>
@@ -182,7 +182,7 @@ export default function Home() {
       <section className="panel">
         <div className="panel-heading">
           <p>Step 2</p>
-          <h2>Confirm Work Order Data</h2>
+          <h2>Confirm Data</h2>
         </div>
         <div className="field-grid">
           {(
@@ -210,7 +210,7 @@ export default function Home() {
       <section className="panel">
         <div className="panel-heading">
           <p>Step 3</p>
-          <h2>State the Issue</h2>
+          <h2>State Issue</h2>
         </div>
         <label>
           Issue Type
@@ -239,7 +239,7 @@ export default function Home() {
         <section className="panel draft-panel">
           <div className="panel-heading">
             <p>Step 4</p>
-            <h2>Draft First. Confirm. Then Send.</h2>
+            <h2>Draft. Confirm. Send.</h2>
           </div>
           <h3>Correction Report</h3>
           <pre>{report}</pre>
@@ -261,7 +261,7 @@ export default function Home() {
 
       <nav className="bottom-nav" aria-label="AI-WOC navigation">
         {['Home', 'Capture', 'Drafts', 'History', 'More'].map((item, index) => (
-          <span className={index === 0 ? 'active' : ''} key={item}>{item}</span>
+          <a className={index === 0 ? 'active' : ''} href={index === 1 ? '#capture' : '#'} key={item}>{item}</a>
         ))}
       </nav>
 
