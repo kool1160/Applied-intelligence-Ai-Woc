@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 type WocData = {
   workOrder: string;
@@ -47,18 +47,18 @@ const confirmationLabels = [
 ];
 
 const workflow = [
-  ['1', 'Capture Router', 'Snap or upload work order.'],
-  ['2', 'Extract + Confirm', 'Pull WO, part, process, and rate into clean fields.'],
-  ['3', 'Build Correction', 'Generate report and Engineering email draft.'],
-  ['4', 'Confirm + Send', 'Draft first. Confirm accuracy. Then send.'],
+  ['📷', 'Capture Router', 'Snap or upload work order.'],
+  ['📋', 'Extract + Confirm', 'Pull WO, part, process, and rate into clean fields.'],
+  ['🗂', 'Build Correction', 'Generate report and Engineering email draft.'],
+  ['➤', 'Confirm + Send', 'Draft first. Confirm accuracy. Then send.'],
 ];
 
 const navItems = [
   ['⌂', 'Home', '#home'],
-  ['▣', 'Capture', '#capture'],
-  ['▤', 'Drafts', '#drafts'],
+  ['📷', 'Capture', '#capture'],
+  ['🗂', 'Drafts', '#drafts'],
   ['◷', 'History', '#history'],
-  ['•••', 'More', '#more'],
+  ['⚙', 'More', '#more'],
 ];
 
 const issueOptions = [
@@ -161,6 +161,7 @@ function extractRouterData(source: string, existing: WocData): WocData {
 }
 
 export default function Home() {
+  const captureInputRef = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<WocData>(blank);
   const [imageUrl, setImageUrl] = useState('');
   const [routerText, setRouterText] = useState('');
@@ -426,10 +427,10 @@ ${emailBody}`;
       </section>
 
       <section className="stats-grid" aria-label="AI-WOC stats">
-        <article className="stat-card glow-card"><div className="stat-icon">▤</div><div><span>Draft Requests</span><strong>{showDraft ? '1' : '0'}</strong><small>Current session</small></div></article>
-        <article className="stat-card glow-card"><div className="stat-icon">➤</div><div><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>Confirmed gate</small></div></article>
-        <article className="stat-card glow-card"><div className="stat-icon">▥</div><div><span>Sent Today</span><strong>{history.length}</strong><small>Session count</small></div></article>
-        <article className="stat-card glow-card"><div className="stat-icon">⚙</div><div><span>Mode</span><strong>WOC</strong><small>Correction flow</small></div></article>
+        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile">🗂</div><div><span>Draft Requests</span><strong>{showDraft ? '1' : '0'}</strong><small>Current session</small></div></article>
+        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile active">➤</div><div><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>Confirmed gate</small></div></article>
+        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile">◷</div><div><span>Sent Today</span><strong>{history.length}</strong><small>Session count</small></div></article>
+        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile">ID</div><div><span>Mode</span><strong>WOC</strong><small>Correction flow</small></div></article>
       </section>
 
       <section className="workflow-card compact-card glow-card">
@@ -439,7 +440,7 @@ ${emailBody}`;
         </div>
         {workflow.map(([step, title, subtitle]) => (
           <div className="workflow-row" key={title}>
-            <div className="step-box">{step}</div>
+            <div className="step-box glass-icon-tile">{step}</div>
             <div>
               <h3>{title}</h3>
               <p>{subtitle}</p>
@@ -456,6 +457,8 @@ ${emailBody}`;
         </div>
         <p className="mini-note">Use the camera/upload for evidence. For this MVP, paste copied router/OCR text below to auto-fill fields, then verify manually before sending.</p>
         <input
+          ref={captureInputRef}
+          className="capture-input-hidden"
           type="file"
           accept="image/*"
           capture="environment"
@@ -464,6 +467,13 @@ ${emailBody}`;
             if (file) setImageUrl(URL.createObjectURL(file));
           }}
         />
+        <button type="button" className="capture-trigger" onClick={() => captureInputRef.current?.click()}>
+          <span className="glass-icon-tile active">📷</span>
+          <span>
+            <strong>Capture Work Order</strong>
+            <small>Take a photo or upload a work order image.</small>
+          </span>
+        </button>
         {imageUrl ? <img className="preview" src={imageUrl} alt="Uploaded work order preview" /> : null}
         <label>
           Paste Router / OCR Text
@@ -590,7 +600,7 @@ ${emailBody}`;
       <nav className="bottom-nav" aria-label="AI-WOC navigation">
         {navItems.map(([icon, item, target], index) => (
           <a className={index === 0 ? 'active' : ''} href={target} key={item}>
-            <span className="nav-icon">{icon}</span>
+            <span className={`nav-icon glass-icon-tile ${index === 0 ? 'active' : ''}`}>{icon}</span>
             <span>{item}</span>
           </a>
         ))}
