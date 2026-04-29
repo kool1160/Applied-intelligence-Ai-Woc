@@ -1,0 +1,141 @@
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: radial-gradient(circle at top, #10213f 0, #050914 38%, #03060d 100%);
+  color: #eaf1ff;
+}
+
+.container {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.hero {
+  padding: 18px 4px 8px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 36px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #66a6ff;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid rgba(104, 154, 255, 0.28);
+  border-radius: 20px;
+  background: rgba(10, 18, 36, 0.88);
+  box-shadow: 0 0 26px rgba(39, 112, 255, 0.18);
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin: 12px 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px;
+  border: 1px solid rgba(105, 153, 255, 0.38);
+  border-radius: 12px;
+  background: #071022;
+  color: #f4f8ff;
+  font: inherit;
+}
+
+textarea {
+  min-height: 110px;
+}
+
+button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 14px;
+  background: #2674ff;
+  color: white;
+  font-weight: 800;
+  font-size: 15px;
+}
+
+button.secondary {
+  background: #1a2a48;
+}
+
+button:disabled {
+  opacity: 0.45;
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.preview {
+  width: 100%;
+  margin-top: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(105, 153, 255, 0.38);
+}
+
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 12px;
+  border: 1px solid rgba(105, 153, 255, 0.28);
+  border-radius: 14px;
+  background: #050b18;
+  color: #dce9ff;
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.check input {
+  width: auto;
+  margin-top: 2px;
+}
+
+.status {
+  position: sticky;
+  bottom: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #0d1b34;
+  border: 1px solid rgba(105, 153, 255, 0.4);
+}
