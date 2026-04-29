@@ -1,62 +1,211 @@
 :root {
   color-scheme: dark;
+  --bg: #030712;
+  --panel: rgba(7, 16, 34, 0.86);
+  --panel-2: rgba(12, 25, 51, 0.72);
+  --line: rgba(104, 154, 255, 0.34);
+  --glow: rgba(43, 124, 255, 0.3);
+  --blue: #2f7bff;
+  --soft-blue: #8db6ff;
+  --red: #d0182f;
+  --text: #f4f8ff;
+  --muted: #aebce0;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
-  background: radial-gradient(circle at top, #10213f 0, #050914 38%, #03060d 100%);
-  color: #eaf1ff;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(40, 111, 255, 0.2), transparent 34%),
+    radial-gradient(circle at 90% 20%, rgba(208, 24, 47, 0.12), transparent 26%),
+    linear-gradient(180deg, #071326 0%, var(--bg) 48%, #01030a 100%);
+  color: var(--text);
 }
 
-.container {
+.shell {
   width: 100%;
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 18px;
+  padding: 18px 18px 104px;
 }
 
-.hero {
-  padding: 18px 4px 8px;
+.brand-card,
+.mission-card,
+.workflow-card,
+.panel,
+.stats-grid article,
+.bottom-nav {
+  border: 1px solid var(--line);
+  background: linear-gradient(145deg, rgba(9, 20, 42, 0.94), rgba(4, 10, 24, 0.86));
+  box-shadow: 0 0 28px var(--glow), inset 0 0 30px rgba(47, 123, 255, 0.06);
+  backdrop-filter: blur(16px);
 }
 
-.hero h1 {
-  margin: 0;
-  font-size: 36px;
+.brand-card {
+  display: grid;
+  grid-template-columns: 1.2fr 1px 1fr;
+  gap: 18px;
+  align-items: center;
+  padding: 20px;
+  border-radius: 28px;
 }
 
-.eyebrow {
+.refab-mark span,
+.refab-mark strong {
+  font-size: clamp(42px, 14vw, 76px);
+  line-height: 0.85;
+  letter-spacing: -0.08em;
+  font-weight: 950;
+}
+
+.refab-mark span { color: #272a30; }
+.refab-mark strong { color: var(--red); }
+.refab-mark small {
+  display: block;
+  margin-top: 10px;
+  color: rgba(255,255,255,0.52);
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.brand-divider { height: 100%; background: linear-gradient(transparent, var(--line), transparent); }
+.system-title p,
+.panel-heading p {
   margin: 0 0 8px;
-  color: #66a6ff;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  color: var(--soft-blue);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  font-size: 12px;
   text-transform: uppercase;
 }
 
-.card {
-  margin: 16px 0;
-  padding: 16px;
-  border: 1px solid rgba(104, 154, 255, 0.28);
-  border-radius: 20px;
-  background: rgba(10, 18, 36, 0.88);
-  box-shadow: 0 0 26px rgba(39, 112, 255, 0.18);
+.red-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 14px rgba(208, 24, 47, 0.8);
+  margin-right: 8px;
 }
 
-h1,
-h2,
-h3 {
-  margin-top: 0;
+.system-title h1 {
+  margin: 0 0 8px;
+  font-size: clamp(28px, 8vw, 48px);
+  line-height: 1.02;
+}
+
+.system-title span,
+.mission-card p,
+.workflow-row p,
+.stats-grid small {
+  color: var(--muted);
+}
+
+.mission-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+  margin-top: 18px;
+  padding: 24px;
+  border-radius: 28px;
+}
+
+.mission-card h2 {
+  margin: 0 0 10px;
+  font-size: clamp(32px, 8vw, 52px);
+  line-height: 1.05;
+}
+
+.mission-card p { margin: 0; font-size: 18px; line-height: 1.45; }
+
+.orbit-check {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  border: 1px solid rgba(104, 154, 255, 0.55);
+  color: #7db2ff;
+  font-size: 42px;
+  font-weight: 900;
+  box-shadow: 0 0 34px rgba(47,123,255,.45);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.stats-grid article {
+  border-radius: 20px;
+  padding: 16px;
+}
+
+.stats-grid span { display: block; color: var(--muted); font-weight: 800; }
+.stats-grid strong { display: block; margin-top: 8px; font-size: 34px; line-height: 1; }
+.stats-grid small { display: block; margin-top: 6px; color: #6fa8ff; }
+
+.workflow-card,
+.panel {
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 26px;
+}
+
+.workflow-card h2,
+.panel h2 {
+  margin: 0 0 14px;
+  font-size: 28px;
+}
+
+.workflow-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid rgba(104,154,255,.24);
+  border-radius: 18px;
+  background: rgba(5, 14, 31, 0.72);
+}
+
+.icon-box {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(47,123,255,.7), rgba(17,45,104,.75));
+  box-shadow: inset 0 0 18px rgba(255,255,255,.08), 0 0 18px rgba(47,123,255,.24);
+  font-weight: 900;
+}
+
+.workflow-row h3 { margin: 0 0 4px; font-size: 18px; }
+.workflow-row p { margin: 0; font-size: 14px; }
+.workflow-row span {
+  border: 1px solid rgba(104,154,255,.38);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #6fa8ff;
+  font-weight: 900;
+  font-size: 12px;
 }
 
 label {
   display: block;
   margin: 12px 0;
+  color: #d9e6ff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 input,
@@ -64,78 +213,111 @@ select,
 textarea {
   width: 100%;
   margin-top: 6px;
-  padding: 12px;
+  padding: 13px 14px;
   border: 1px solid rgba(105, 153, 255, 0.38);
-  border-radius: 12px;
-  background: #071022;
-  color: #f4f8ff;
+  border-radius: 14px;
+  background: rgba(3, 9, 21, 0.9);
+  color: var(--text);
   font: inherit;
+  outline: none;
 }
 
-textarea {
-  min-height: 110px;
-}
+textarea { min-height: 116px; }
+
+.field-grid { display: grid; grid-template-columns: 1fr; gap: 2px; }
 
 button {
   width: 100%;
   margin-top: 10px;
-  padding: 14px 16px;
+  padding: 15px 16px;
   border: 0;
-  border-radius: 14px;
-  background: #2674ff;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2f7bff, #2366ec);
   color: white;
-  font-weight: 800;
+  font-weight: 900;
   font-size: 15px;
+  box-shadow: 0 0 22px rgba(47,123,255,.24);
 }
 
 button.secondary {
-  background: #1a2a48;
+  background: rgba(26, 42, 72, 0.9);
+  border: 1px solid rgba(104,154,255,.2);
 }
 
-button:disabled {
-  opacity: 0.45;
-}
-
-.button-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
+button:disabled { opacity: 0.45; }
+.button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 .preview {
   width: 100%;
   margin-top: 12px;
-  border-radius: 16px;
+  border-radius: 18px;
   border: 1px solid rgba(105, 153, 255, 0.38);
 }
 
 pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  padding: 12px;
+  padding: 14px;
   border: 1px solid rgba(105, 153, 255, 0.28);
-  border-radius: 14px;
-  background: #050b18;
+  border-radius: 16px;
+  background: rgba(2, 8, 20, 0.92);
   color: #dce9ff;
+  max-height: 360px;
+  overflow: auto;
 }
 
 .check {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.check input {
-  width: auto;
-  margin-top: 2px;
+.check input { width: auto; margin-top: 2px; }
+
+.bottom-nav {
+  position: sticky;
+  bottom: 14px;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 18px;
+  padding: 10px;
+  border-radius: 28px;
+}
+
+.bottom-nav span {
+  text-align: center;
+  padding: 12px 4px;
+  border-radius: 18px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.bottom-nav .active {
+  color: #8db6ff;
+  background: rgba(47,123,255,.18);
+  box-shadow: inset 0 0 18px rgba(47,123,255,.18);
 }
 
 .status {
   position: sticky;
-  bottom: 12px;
+  bottom: 88px;
+  z-index: 6;
   padding: 12px;
   border-radius: 14px;
   background: #0d1b34;
   border: 1px solid rgba(105, 153, 255, 0.4);
+}
+
+@media (max-width: 620px) {
+  .shell { padding: 14px 14px 96px; }
+  .brand-card { grid-template-columns: 1fr; gap: 12px; }
+  .brand-divider { display: none; }
+  .mission-card { grid-template-columns: 1fr; }
+  .orbit-check { width: 60px; height: 60px; font-size: 32px; }
+  .workflow-row { grid-template-columns: auto 1fr; }
+  .workflow-row span { grid-column: 2; width: fit-content; }
 }
