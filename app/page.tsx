@@ -243,6 +243,7 @@ export default function Home() {
       currentListedRate: current.currentListedRate || currentRate,
       observedBaseline: current.observedBaseline || baseline,
       issueType: 'Incorrect Time',
+      category: current.category || 'Welding',
       priority: 'High',
       problemSummary: `The current listed welding rate of ${currentRate} is not obtainable or sustainable under actual production conditions. A more balanced observed baseline is ${baseline}.`,
       requestedAction: `Please review and update the welding runtime/rate from ${currentRate} to a sustainable baseline of ${baseline}, or establish the correct Engineering-approved welding time.`,
@@ -406,6 +407,16 @@ ${emailBody}`;
   };
 
   const sendEmail = async () => {
+    if (!readyToDraft) {
+      setStatus('Core fields are missing. Fill all required fields before sending.');
+      return;
+    }
+
+    if (!allConfirmed) {
+      setStatus('Confirm every checkbox before sending.');
+      return;
+    }
+
     setSending(true);
     setStatus('');
 
@@ -615,7 +626,7 @@ ${emailBody}`;
               <button type="button" className="secondary" onClick={() => copyText(report)}>Copy Report</button>
               <button type="button" className="secondary" onClick={() => copyText(emailDraft)}>Copy Email</button>
             </div>
-            <button type="button" disabled={!allConfirmed || sending} onClick={sendEmail}>{sending ? 'Sending...' : 'Send Email'}</button>
+            <button type="button" disabled={!readyToDraft || !allConfirmed || sending} onClick={sendEmail}>{sending ? 'Sending...' : 'Send Email'}</button>
           </>
         ) : (
           <div className="empty-state">
