@@ -121,6 +121,53 @@ function cleanLine(value: string) {
   return value.replace(/[|]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+
+
+async function extractSelectablePdfText(file: File) {
+  const buffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  const raw = new TextDecoder('latin1').decode(bytes);
+
+  const decodePdfString = (value: string) => value
+    .replace(/\\([0-7]{1,3})/g, (_, octal) => String.fromCharCode(parseInt(octal, 8)))
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\r')
+    .replace(/\\t/g, '\t')
+    .replace(/\\b/g, '\b')
+    .replace(/\\f/g, '\f')
+    .replace(/\\([()\\])/g, '$1');
+
+  const chunks: string[] = [];
+  const textObjectPattern = /BT([\s\S]*?)ET/g;
+
+  for (const match of raw.matchAll(textObjectPattern)) {
+    const segment = match[1] || '';
+
+    for (const textMatch of segment.matchAll(/\((?:\\.|[^\\)])*\)\s*Tj/g)) {
+      const inner = textMatch[0].replace(/\)\s*Tj$/, '').slice(1);
+      const decoded = decodePdfString(inner).trim();
+      if (decoded) chunks.push(decoded);
+    }
+
+    for (const arrayMatch of segment.matchAll(/\[(.*?)\]\s*TJ/g)) {
+      const merged = [...arrayMatch[1].matchAll(/\((?:\\.|[^\\)])*\)/g)]
+        .map((m) => decodePdfString(m[0].slice(1, -1)))
+        .join('')
+        .trim();
+      if (merged) chunks.push(merged);
+    }
+
+    for (const hexMatch of segment.matchAll(/<([0-9A-Fa-f]+)>\s*Tj/g)) {
+      const hex = hexMatch[1];
+      const padded = hex.length % 2 === 0 ? hex : `0${hex}`;
+      const decoded = padded.match(/.{1,2}/g)?.map((pair) => String.fromCharCode(parseInt(pair, 16))).join('').trim();
+      if (decoded) chunks.push(decoded);
+    }
+  }
+
+  return chunks.join('\n').replace(/\s+/g, ' ').trim();
+}
+
 function extractRouterData(source: string, existing: WocData): WocData {
   const text = source.replace(/\r/g, '\n');
   const lines = text.split('\n').map(cleanLine).filter(Boolean);
@@ -396,7 +443,7 @@ ${emailBody}`;
 
   const allConfirmed = checks.every(Boolean);
 
-  const onWorkOrderFileSelected = (file?: File) => {
+  const onWorkOrderFileSelected = async (file?: File) => {
     if (!file) return;
 
     setSelectedFileName(file.name);
@@ -406,6 +453,22 @@ ${emailBody}`;
     }
 
     setImageUrl('');
+
+    if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+      try {
+        const extractedText = await extractSelectablePdfText(file);
+
+        if (extractedText) {
+          setRouterText(extractedText);
+          setStatus('PDF text extracted. Review fields before sending.');
+          return;
+        }
+
+        setStatus('No selectable PDF text found. Paste OCR text manually or use a photo/OCR workflow.');
+      } catch {
+        setStatus('No selectable PDF text found. Paste OCR text manually or use a photo/OCR workflow.');
+      }
+    }
   };
   const readyToDraft = Boolean(data.workOrder && data.partNumber && data.operation && data.process && data.category && data.problemSummary && data.requestedAction);
 
