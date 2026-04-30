@@ -182,9 +182,11 @@ function extractRouterData(source: string, existing: WocData): WocData {
 }
 
 export default function Home() {
-  const captureInputRef = useRef<HTMLInputElement>(null);
+  const takePhotoInputRef = useRef<HTMLInputElement>(null);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<WocData>(blank);
   const [imageUrl, setImageUrl] = useState('');
+  const [selectedFileName, setSelectedFileName] = useState('');
   const [routerText, setRouterText] = useState('');
   const [showDraft, setShowDraft] = useState(false);
   const [checks, setChecks] = useState<boolean[]>(Array(5).fill(false));
@@ -393,6 +395,18 @@ ${emailBody}`;
   }, [emailBody, emailSubject]);
 
   const allConfirmed = checks.every(Boolean);
+
+  const onWorkOrderFileSelected = (file?: File) => {
+    if (!file) return;
+
+    setSelectedFileName(file.name);
+    if (file.type.startsWith('image/')) {
+      setImageUrl(URL.createObjectURL(file));
+      return;
+    }
+
+    setImageUrl('');
+  };
   const readyToDraft = Boolean(data.workOrder && data.partNumber && data.operation && data.process && data.category && data.problemSummary && data.requestedAction);
 
   const copyText = async (text: string) => {
@@ -513,24 +527,40 @@ ${emailBody}`;
         </div>
         <p className="mini-note">Use the camera/upload for evidence. For this MVP, paste copied router/OCR text below to auto-fill fields, then verify manually before sending.</p>
         <input
-          ref={captureInputRef}
+          ref={takePhotoInputRef}
           className="capture-input-hidden"
           type="file"
           accept="image/*"
           capture="environment"
           onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) setImageUrl(URL.createObjectURL(file));
+            onWorkOrderFileSelected(event.target.files?.[0]);
           }}
         />
-        <button type="button" className="capture-trigger" onClick={() => captureInputRef.current?.click()}>
+        <input
+          ref={uploadInputRef}
+          className="capture-input-hidden"
+          type="file"
+          accept="image/*,application/pdf"
+          onChange={(event) => {
+            onWorkOrderFileSelected(event.target.files?.[0]);
+          }}
+        />
+        <button type="button" className="capture-trigger" onClick={() => takePhotoInputRef.current?.click()}>
           <span className="glass-icon-tile active">📷</span>
           <span>
-            <strong>Capture Work Order</strong>
-            <small>Take a photo or upload a work order image.</small>
+            <strong>Take Photo</strong>
+            <small>Use rear camera to capture work order.</small>
+          </span>
+        </button>
+        <button type="button" className="capture-trigger" onClick={() => uploadInputRef.current?.click()}>
+          <span className="glass-icon-tile">📁</span>
+          <span>
+            <strong>Upload File / Picture</strong>
+            <small>Select image or PDF from Photo Library or Files.</small>
           </span>
         </button>
         {imageUrl ? <img className="preview" src={imageUrl} alt="Uploaded work order preview" /> : null}
+        {!imageUrl && selectedFileName ? <p className="mini-note">Selected file: {selectedFileName}</p> : null}
         <label>
           Paste Router / OCR Text
           <textarea
