@@ -1,0 +1,40 @@
+.status {
+  top: max(14px, calc(env(safe-area-inset-top) + 10px));
+  bottom: auto;
+  left: 18px;
+  right: 18px;
+  z-index: 45;
+  max-width: 520px;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.35;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-8px);
+  animation: status-toast-in-out 3.2s ease forwards;
+}
+
+@keyframes status-toast-in-out {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  10%, 78% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+  }
+}
+
+@media (max-width: 620px) {
+  .status {
+    left: 14px;
+    right: 14px;
+    max-width: none;
+    font-size: 13px;
+  }
+}
