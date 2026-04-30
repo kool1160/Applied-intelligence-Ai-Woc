@@ -38,9 +38,12 @@ Do not commit `.env.local` or any real API keys.
 RESEND_API_KEY=
 AI_WOC_FROM_EMAIL=
 AI_WOC_DEFAULT_TO_EMAIL=Christophertroyhilton@gmail.com
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 `RESEND_API_KEY` is used only by the server-side send route.
+
+`OPENAI_API_KEY` is used only by the server-side `/api/extract-vision` route for AI Vision header extraction.
 
 `AI_WOC_FROM_EMAIL` must be a sender address approved by the email provider.
 

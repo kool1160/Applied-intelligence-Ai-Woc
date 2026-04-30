@@ -233,6 +233,7 @@ export default function Home() {
   const [selectedFileName, setSelectedFileName] = useState('');
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [ocrLoading, setOcrLoading] = useState(false);
+  const [visionLoading, setVisionLoading] = useState(false);
   const [routerText, setRouterText] = useState('');
   const [showDraft, setShowDraft] = useState(false);
   const [checks, setChecks] = useState<boolean[]>(Array(5).fill(false));
@@ -332,6 +333,51 @@ export default function Home() {
       setOcrLoading(false);
     }
   };
+
+
+  const extractWithVision = async () => {
+    if (!selectedImageFile || visionLoading) return;
+
+    setVisionLoading(true);
+    setStatus('Extracting header with AI Vision...');
+
+    try {
+      const formData = new FormData();
+      formData.append('image', selectedImageFile);
+
+      const response = await fetch('/api/extract-vision', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.error || 'Vision extraction failed.');
+      }
+
+      setData((current) => ({
+        ...current,
+        workOrder: result.workOrder || current.workOrder,
+        partNumber: result.partNumber || current.partNumber || result.cadDrawing || '',
+        revision: result.revision || current.revision,
+        customer: result.customer || current.customer,
+        quantity: result.quantity || current.quantity,
+      }));
+      setChecks(Array(5).fill(false));
+
+      if (Array.isArray(result.needsReview) && result.needsReview.length) {
+        setStatus(`AI Vision extracted header. Review: ${result.needsReview.join(', ')}.`);
+      } else {
+        setStatus('AI Vision extracted header fields. Verify before generating draft.');
+      }
+    } catch (_error) {
+      setStatus('AI Vision extraction failed. Try Basic OCR Fallback or enter fields manually.');
+    } finally {
+      setVisionLoading(false);
+    }
+  };
+
   const applyWeldingTimeTemplate = () => {
     const currentRate = data.currentListedRate || '33 parts per hour';
     const baseline = data.observedBaseline || '12.5 parts per hour';
@@ -682,14 +728,24 @@ ${emailBody}`;
           </span>
         </button>
         {imageUrl ? <img className="preview" src={imageUrl} alt="Uploaded work order preview" /> : null}
-        <button
-          type="button"
-          className="secondary"
-          disabled={!selectedImageFile || ocrLoading}
-          onClick={extractTextFromPhoto}
-        >
-          {ocrLoading ? 'Extracting Text…' : 'Extract Text From Photo'}
-        </button>
+        <div className="button-row">
+          <button
+            type="button"
+            className="secondary"
+            disabled={!selectedImageFile || visionLoading}
+            onClick={extractWithVision}
+          >
+            {visionLoading ? 'Extracting Vision…' : 'Extract With AI Vision'}
+          </button>
+          <button
+            type="button"
+            className="secondary"
+            disabled={!selectedImageFile || ocrLoading}
+            onClick={extractTextFromPhoto}
+          >
+            {ocrLoading ? 'Extracting Text…' : 'Basic OCR Fallback'}
+          </button>
+        </div>
         {!imageUrl && selectedFileName ? <p className="mini-note">Selected file: {selectedFileName}</p> : null}
         <div className="quick-entry-card">
           <h3>Quick Entry</h3>
