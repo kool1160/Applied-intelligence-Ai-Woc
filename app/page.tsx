@@ -131,32 +131,66 @@ function cleanLine(value: string) {
   return value.replace(/[|]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+function normalizeWorkOrder(value: string) {
+  const cleaned = value.trim().replace(/\s+/g, ' ');
+  const hyphenated = cleaned.match(/^([0-9]{4,8})-([0-9]{2,4})$/);
+  if (hyphenated) return `${hyphenated[1]}-${hyphenated[2]}`;
+
+  const split = cleaned.match(/^([0-9]{4,8})\s+([0-9]{2,4})$/);
+  if (split) return `${split[1]}-${split[2]}`;
+
+  return cleaned.replace(/\s+/g, '');
+}
+
 function extractRouterData(source: string, existing: WocData): WocData {
   const text = source.replace(/\r/g, '\n');
   const lines = text.split('\n').map(cleanLine).filter(Boolean);
   const joined = lines.join('\n');
 
-  const workOrder = firstMatch(joined, [
+  const workOrderRaw = firstMatch(joined, [
     /(?:work\s*order|workorder|wo|w\/o)\s*(?:number|no\.?|#|:)?\s*[:#-]?\s*([0-9]{4,8}[-\s]?[0-9]{2,4})/i,
+    /\b([0-9]{4,8}\s+[0-9]{2,4})\b/,
     /\b([0-9]{5,6}-[0-9]{3})\b/,
-  ]).replace(/\s+/g, '');
+  ]);
+  const workOrder = workOrderRaw ? normalizeWorkOrder(workOrderRaw) : '';
 
-  const partNumber = firstMatch(joined, [
+  const tableHeaderIndex = lines.findIndex((line) => /part\s*number\s*\/\s*rev\s*\/\s*loc/i.test(line));
+  const tableLine = tableHeaderIndex >= 0 ? lines[tableHeaderIndex + 1] ?? '' : '';
+
+  const tablePartNumber = firstMatch(tableLine, [/^\s*([A-Z0-9][A-Z0-9._/-]{2,})\b/i]);
+  const tableRevision = firstMatch(tableLine, [/^\s*[A-Z0-9][A-Z0-9._/-]{2,}\s+([A-Z0-9]{1,4})\b/i]);
+  const tableCustomer = tableLine
+    ? tableLine
+      .replace(/^\s*[A-Z0-9][A-Z0-9._/-]{2,}\s+[A-Z0-9]{1,4}\s*/i, '')
+      .trim()
+    : '';
+
+  const partNumberFromLabel = firstMatch(joined, [
     /(?:part\s*(?:number|no\.?|#)|item\s*(?:number|no\.?|#))\s*[:#-]?\s*([A-Z0-9][A-Z0-9._/-]{3,})/i,
     /\b([A-Z]{2,5}-[A-Z0-9._/-]{3,})\b/,
   ]);
+  const partNumberFromCad = firstMatch(joined, [
+    /(?:cad\s*drawing)\s*[:#-]?\s*([A-Z0-9][A-Z0-9._/-]{2,})/i,
+  ]);
+  const partNumber = tablePartNumber || partNumberFromLabel || partNumberFromCad;
 
-  const revision = firstMatch(joined, [
+  const revision = tableRevision || firstMatch(joined, [
     /(?:rev(?:ision)?\.?)\s*[:#-]?\s*([A-Z0-9]{1,4})\b/i,
   ]);
 
-  const customer = firstMatch(joined, [
+  const customer = tableCustomer || firstMatch(joined, [
     /(?:customer|cust\.?)\s*[:#-]?\s*([A-Z0-9][A-Z0-9 .&/-]{2,})/i,
   ]);
 
-  const quantity = firstMatch(joined, [
-    /(?:quantity|qty)\s*[:#-]?\s*([0-9,]+\s*(?:ea|pcs?|pieces?)?)/i,
-  ]);
+  let quantity = firstMatch(joined, [/(?:quantity|qty)\s*[:#-]?\s*([0-9]+(?:\.[0-9]+)?\s*(?:ea|pcs?|pieces?)?)/i]);
+  if (!quantity) {
+    const headerIndex = lines.findIndex((line) => /work\s*order.*due.*quantity.*(?:uo|u\/o|unit)/i.test(line));
+    const dataLine = headerIndex >= 0 ? lines[headerIndex + 1] ?? '' : '';
+    const qtyUoMatch = dataLine.match(/\b([0-9]+(?:\.[0-9]+)?)\s+([A-Z]{1,4})\b/);
+    if (qtyUoMatch) {
+      quantity = `${qtyUoMatch[1]} ${qtyUoMatch[2]}`;
+    }
+  }
 
   const operation = firstMatch(joined, [
     /(?:operation|op\.?|router\s*step)\s*[:#-]?\s*([0-9]{3,6}\s*[A-Z0-9 /.-]{0,28})/i,
