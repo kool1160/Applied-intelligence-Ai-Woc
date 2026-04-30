@@ -585,6 +585,59 @@ ${emailBody}`;
         </button>
         {imageUrl ? <img className="preview" src={imageUrl} alt="Uploaded work order preview" /> : null}
         {!imageUrl && selectedFileName ? <p className="mini-note">Selected file: {selectedFileName}</p> : null}
+        <div className="quick-entry-card">
+          <h3>Quick Entry</h3>
+          <p>Enter the printed header and issue details while viewing the work order image.</p>
+          <div className="quick-entry-grid">
+            <label>
+              Work Order Number
+              <input value={data.workOrder} onChange={(event) => setField('workOrder', event.target.value)} />
+            </label>
+            <label>
+              Part Number
+              <input value={data.partNumber} onChange={(event) => setField('partNumber', event.target.value)} />
+            </label>
+            <label>
+              Revision
+              <input value={data.revision} onChange={(event) => setField('revision', event.target.value)} />
+            </label>
+            <label>
+              Customer
+              <input value={data.customer} onChange={(event) => setField('customer', event.target.value)} />
+            </label>
+            <label>
+              Quantity
+              <input value={data.quantity} onChange={(event) => setField('quantity', event.target.value)} />
+            </label>
+            <label>
+              Category
+              <select value={data.category} onChange={(event) => setField('category', event.target.value)}>
+                <option value="">Select category</option>
+                {categoryOptions.map((item) => <option key={item}>{item}</option>)}
+              </select>
+            </label>
+            <label>
+              Issue Type
+              <select value={data.issueType} onChange={(event) => setField('issueType', event.target.value)}>
+                {issueOptions.map((item) => <option key={item}>{item}</option>)}
+              </select>
+            </label>
+            <label>
+              Priority
+              <select value={data.priority} onChange={(event) => setField('priority', event.target.value)}>
+                {priorityOptions.map((item) => <option key={item}>{item}</option>)}
+              </select>
+            </label>
+            <label className="quick-entry-full">
+              Problem Summary
+              <textarea value={data.problemSummary} onChange={(event) => setField('problemSummary', event.target.value)} />
+            </label>
+            <label className="quick-entry-full">
+              Requested Engineering Action
+              <textarea value={data.requestedAction} onChange={(event) => setField('requestedAction', event.target.value)} />
+            </label>
+          </div>
+        </div>
         <label>
           Paste Router / OCR Text
           <textarea

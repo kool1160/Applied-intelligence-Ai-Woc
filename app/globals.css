@@ -452,6 +452,43 @@ button:disabled { opacity: 0.45; }
   border: 1px solid rgba(202, 209, 217, 0.35);
 }
 
+.quick-entry-card {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(202, 209, 217, 0.28);
+  background: rgba(12, 14, 19, 0.82);
+}
+
+.quick-entry-card h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.quick-entry-card p {
+  margin: 6px 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.quick-entry-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.quick-entry-grid label {
+  margin: 0;
+}
+
+.quick-entry-grid textarea {
+  min-height: 86px;
+}
+
+.quick-entry-full {
+  grid-column: 1 / -1;
+}
+
 pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
