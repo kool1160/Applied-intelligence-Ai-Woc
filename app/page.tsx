@@ -407,7 +407,27 @@ ${emailBody}`;
 
     setImageUrl('');
   };
-  const readyToDraft = Boolean(data.workOrder && data.partNumber && data.operation && data.process && data.category && data.problemSummary && data.requestedAction);
+  const hasPartNumber = Boolean(data.partNumber.trim());
+  const hasWorkOrder = Boolean(data.workOrder.trim());
+  const hasIdentifier = hasPartNumber || hasWorkOrder;
+  const readyToDraft = Boolean(
+    hasIdentifier
+    && data.category.trim()
+    && data.priority.trim()
+    && data.issueType.trim()
+    && data.problemSummary.trim()
+    && data.requestedAction.trim(),
+  );
+
+  const readinessWarnings: string[] = [];
+  if (!hasIdentifier) readinessWarnings.push('Missing identifier: add Part Number or Work Order Number.');
+  if (!hasPartNumber && hasWorkOrder) readinessWarnings.push('Part Number is preferred. A work order may contain multiple parts.');
+  if (!hasWorkOrder && hasPartNumber) readinessWarnings.push('Work Order Number is recommended as a helpful backup identifier.');
+  if (!data.operation.trim()) readinessWarnings.push('Operation / Router Step is preferred but not required for send.');
+  if (!data.process.trim()) readinessWarnings.push('Process is preferred but not required for send.');
+  if (!data.revision.trim()) readinessWarnings.push('Revision is preferred but not required for send.');
+  if (!data.customer.trim()) readinessWarnings.push('Customer is preferred but not required for send.');
+  if (!data.quantity.trim()) readinessWarnings.push('Quantity is preferred but not required for send.');
 
   const copyText = async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -422,7 +442,7 @@ ${emailBody}`;
 
   const sendEmail = async () => {
     if (!readyToDraft) {
-      setStatus('Core fields are missing. Fill all required fields before sending.');
+      setStatus('Required fields are missing. Add Part Number or Work Order Number, plus Category, Priority, Issue Type, Problem Summary, and Requested Engineering Action before sending.');
       return;
     }
 
@@ -640,8 +660,16 @@ ${emailBody}`;
         {showDraft ? (
           <>
             <div className={readyToDraft ? 'gate good' : 'gate warn'}>
-              {readyToDraft ? 'Core fields complete. Confirm accuracy before sending.' : 'Some core fields are missing. Fill any bracketed items before confirming.'}
+              {readyToDraft ? 'Required fields complete. Confirm accuracy before sending.' : 'Some required fields are missing. Fill bracketed required items before confirming.'}
             </div>
+            {readinessWarnings.length ? (
+              <div className="gate warn">
+                <strong>Warnings (do not block send if required fields are complete):</strong>
+                <ul>
+                  {readinessWarnings.map((warning) => <li key={warning}>{warning}</li>)}
+                </ul>
+              </div>
+            ) : null}
             <h3>Correction Report</h3>
             <pre>{report}</pre>
             <h3>Email Draft</h3>
