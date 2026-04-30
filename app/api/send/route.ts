@@ -3,22 +3,21 @@ import { Resend } from 'resend';
 
 export async function POST(req: Request) {
   try {
-    const { subject, emailBody, reportBody } = await req.json();
+    const { subject, emailBody } = await req.json();
 
-    if (typeof subject !== 'string' || typeof emailBody !== 'string' || typeof reportBody !== 'string') {
+    if (typeof subject !== 'string' || typeof emailBody !== 'string') {
       return NextResponse.json(
-        { error: 'subject, emailBody, and reportBody are required.' },
+        { error: 'subject and emailBody are required.' },
         { status: 400 }
       );
     }
 
     const trimmedSubject = subject.trim();
     const trimmedEmailBody = emailBody.trim();
-    const trimmedReportBody = reportBody.trim();
 
-    if (!trimmedSubject || !trimmedEmailBody || !trimmedReportBody) {
+    if (!trimmedSubject || !trimmedEmailBody) {
       return NextResponse.json(
-        { error: 'subject, emailBody, and reportBody are required.' },
+        { error: 'subject and emailBody are required.' },
         { status: 400 }
       );
     }
@@ -35,13 +34,11 @@ export async function POST(req: Request) {
     }
 
     const resend = new Resend(apiKey);
-    const fullBody = `${trimmedEmailBody}\n\n--------------------\nENGINEERING WORK ORDER CORRECTION REPORT\n--------------------\n\n${trimmedReportBody}`;
-
     const sent = await resend.emails.send({
       from,
       to,
       subject: trimmedSubject,
-      text: fullBody,
+      text: trimmedEmailBody,
     });
 
     if (sent.error) {

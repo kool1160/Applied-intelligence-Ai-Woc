@@ -14,9 +14,28 @@ type WocData = {
   currentListedRate: string;
   observedBaseline: string;
   issueType: string;
+  category: string;
   priority: string;
   problemSummary: string;
   requestedAction: string;
+};
+
+type SubmissionRecord = {
+  wocId: string;
+  dateSubmitted: string;
+  submittedBy: string;
+  workOrderNumber: string;
+  partNumber: string;
+  departmentProcess: string;
+  issueType: string;
+  category: string;
+  priority: string;
+  requestedAction: string;
+  status: string;
+  assignedOwner: string;
+  engineeringNotes: string;
+  erpUpdated: boolean;
+  closedDate: string;
 };
 
 const DEFAULT_TO_EMAIL = 'Christophertroyhilton@gmail.com';
@@ -33,6 +52,7 @@ const blank: WocData = {
   currentListedRate: '',
   observedBaseline: '',
   issueType: 'Incorrect Time',
+  category: '',
   priority: 'Medium',
   problemSummary: '',
   requestedAction: '',
@@ -72,7 +92,8 @@ const issueOptions = [
   'Other',
 ];
 
-const priorityOptions = ['Low', 'Medium', 'High', 'Critical'];
+const categoryOptions = ['Welding', 'Machining', 'Fixtures', 'Routing', 'Material', 'Hardware', 'Quality', 'Other'];
+const priorityOptions = ['Low', 'Medium', 'High', 'Urgent'];
 
 const dataFields: [keyof WocData, string][] = [
   ['workOrder', 'Work Order Number'],
@@ -169,7 +190,8 @@ export default function Home() {
   const [checks, setChecks] = useState<boolean[]>(Array(5).fill(false));
   const [status, setStatus] = useState('');
   const [sending, setSending] = useState(false);
-  const [history, setHistory] = useState<string[]>([]);
+  const [history, setHistory] = useState<SubmissionRecord[]>([]);
+  const [nextWocId, setNextWocId] = useState(1);
 
   const setField = (field: keyof WocData, value: string) => {
     setData((current) => ({ ...current, [field]: value }));
@@ -189,6 +211,7 @@ export default function Home() {
       currentListedRate: '33 parts per hour',
       observedBaseline: '12.5 parts per hour',
       issueType: 'Incorrect Time',
+      category: 'Welding',
       priority: 'High',
       problemSummary: 'The current listed welding rate of 33 parts per hour is not obtainable or sustainable under actual production conditions.',
       requestedAction: 'Please review and update the welding runtime/rate from 33 parts per hour to a sustainable baseline of 12.5 parts per hour, or establish the correct Engineering-approved welding time.',
@@ -220,6 +243,7 @@ export default function Home() {
       currentListedRate: current.currentListedRate || currentRate,
       observedBaseline: current.observedBaseline || baseline,
       issueType: 'Incorrect Time',
+      category: current.category || 'Welding',
       priority: 'High',
       problemSummary: `The current listed welding rate of ${currentRate} is not obtainable or sustainable under actual production conditions. A more balanced observed baseline is ${baseline}.`,
       requestedAction: `Please review and update the welding runtime/rate from ${currentRate} to a sustainable baseline of ${baseline}, or establish the correct Engineering-approved welding time.`,
@@ -239,6 +263,9 @@ ${data.workOrder || '[WO REQUIRED]'} / ${data.partNumber || '[PART REQUIRED]'} �
 
 Correction Type:
 ${data.issueType}
+
+Category:
+${data.category || '[CATEGORY REQUIRED]'}
 
 Priority:
 ${data.priority}
@@ -307,8 +334,9 @@ ${today}`;
   }, [data, today]);
 
   const emailSubject = useMemo(() => {
-    return `Work Order Correction Request – ${data.workOrder || 'WO TBD'} / ${data.partNumber || 'Part TBD'} – ${data.issueType}`;
-  }, [data.issueType, data.partNumber, data.workOrder]);
+    const category = (data.category || 'CATEGORY TBD').toUpperCase();
+    return `[AI-WOC][${category}] WO ${data.workOrder || 'TBD'} | ${data.partNumber || 'PART TBD'} | ${data.issueType}`;
+  }, [data.category, data.issueType, data.partNumber, data.workOrder]);
 
   const emailBody = useMemo(() => {
     return `Engineering Team,
@@ -365,7 +393,7 @@ ${emailBody}`;
   }, [emailBody, emailSubject]);
 
   const allConfirmed = checks.every(Boolean);
-  const readyToDraft = Boolean(data.workOrder && data.partNumber && data.operation && data.process && data.problemSummary && data.requestedAction);
+  const readyToDraft = Boolean(data.workOrder && data.partNumber && data.operation && data.process && data.category && data.problemSummary && data.requestedAction);
 
   const copyText = async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -379,13 +407,23 @@ ${emailBody}`;
   };
 
   const sendEmail = async () => {
+    if (!readyToDraft) {
+      setStatus('Core fields are missing. Fill all required fields before sending.');
+      return;
+    }
+
+    if (!allConfirmed) {
+      setStatus('Confirm every checkbox before sending.');
+      return;
+    }
+
     setSending(true);
     setStatus('');
 
     const res = await fetch('/api/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subject: emailSubject, emailBody, reportBody: report }),
+      body: JSON.stringify({ subject: emailSubject, emailBody }),
     });
 
     const result = await res.json();
@@ -393,8 +431,26 @@ ${emailBody}`;
     if (result.error) {
       setStatus(result.error);
     } else {
-      const record = `${new Date().toLocaleString()} – ${data.workOrder || 'WO TBD'} / ${data.partNumber || 'Part TBD'} sent`;
+      const wocId = `WOC-${String(nextWocId).padStart(4, '0')}`;
+      const record: SubmissionRecord = {
+        wocId,
+        dateSubmitted: new Date().toLocaleString(),
+        submittedBy: 'Chris',
+        workOrderNumber: data.workOrder || '',
+        partNumber: data.partNumber || '',
+        departmentProcess: `${data.department || '[N/A]'} / ${data.process || '[N/A]'}`,
+        issueType: data.issueType,
+        category: data.category,
+        priority: data.priority,
+        requestedAction: data.requestedAction,
+        status: 'Submitted',
+        assignedOwner: 'Engineering Queue',
+        engineeringNotes: '',
+        erpUpdated: false,
+        closedDate: '',
+      };
       setHistory((current) => [record, ...current].slice(0, 8));
+      setNextWocId((current) => current + 1);
       setStatus('Email sent successfully.');
     }
 
@@ -523,6 +579,13 @@ ${emailBody}`;
           </select>
         </label>
         <label>
+          Category
+          <select value={data.category} onChange={(event) => setField('category', event.target.value)}>
+            <option value="">Select category</option>
+            {categoryOptions.map((item) => <option key={item}>{item}</option>)}
+          </select>
+        </label>
+        <label>
           Priority
           <select value={data.priority} onChange={(event) => setField('priority', event.target.value)}>
             {priorityOptions.map((item) => <option key={item}>{item}</option>)}
@@ -563,7 +626,7 @@ ${emailBody}`;
               <button type="button" className="secondary" onClick={() => copyText(report)}>Copy Report</button>
               <button type="button" className="secondary" onClick={() => copyText(emailDraft)}>Copy Email</button>
             </div>
-            <button type="button" disabled={!allConfirmed || sending} onClick={sendEmail}>{sending ? 'Sending...' : 'Send Email'}</button>
+            <button type="button" disabled={!readyToDraft || !allConfirmed || sending} onClick={sendEmail}>{sending ? 'Sending...' : 'Send Email'}</button>
           </>
         ) : (
           <div className="empty-state">
@@ -581,7 +644,11 @@ ${emailBody}`;
         </div>
         {history.length ? (
           <ul className="history-list">
-            {history.map((item) => <li key={item}>{item}</li>)}
+            {history.map((item) => (
+              <li key={item.wocId}>
+                <strong>{item.wocId}</strong> — {item.dateSubmitted} — WO {item.workOrderNumber || 'TBD'} / {item.partNumber || 'TBD'} — {item.category} — {item.status}
+              </li>
+            ))}
           </ul>
         ) : (
           <p>Sent requests will appear here after email delivery is connected and tracking is added.</p>
