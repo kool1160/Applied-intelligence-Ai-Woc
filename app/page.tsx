@@ -142,6 +142,10 @@ function normalizeWorkOrder(value: string) {
   return cleaned.replace(/\s+/g, '');
 }
 
+function normalizeQuantityCandidate(value: string) {
+  return value.trim().replace(/\s+/g, ' ').toUpperCase();
+}
+
 function extractRouterData(source: string, existing: WocData): WocData {
   const text = source.replace(/\r/g, '\n');
   const lines = text.split('\n').map(cleanLine).filter(Boolean);
@@ -182,15 +186,38 @@ function extractRouterData(source: string, existing: WocData): WocData {
     /(?:customer|cust\.?)\s*[:#-]?\s*([A-Z0-9][A-Z0-9 .&/-]{2,})/i,
   ]);
 
-  let quantity = firstMatch(joined, [/(?:quantity|qty)\s*[:#-]?\s*([0-9]+(?:\.[0-9]+)?\s*(?:ea|pcs?|pieces?)?)/i]);
-  if (!quantity) {
-    const headerIndex = lines.findIndex((line) => /work\s*order.*due.*quantity.*(?:uo|u\/o|unit)/i.test(line));
-    const dataLine = headerIndex >= 0 ? lines[headerIndex + 1] ?? '' : '';
-    const qtyUoMatch = dataLine.match(/\b([0-9]+(?:\.[0-9]+)?)\s+([A-Z]{1,4})\b/);
-    if (qtyUoMatch) {
-      quantity = `${qtyUoMatch[1]} ${qtyUoMatch[2]}`;
-    }
+  const blockedQuantityValues = new Set(
+    [workOrder, partNumber, partNumberFromCad]
+      .filter(Boolean)
+      .map((value) => normalizeQuantityCandidate(value as string)),
+  );
+  const salesOrderValue = firstMatch(joined, [/(?:sales\s*order)\s*[:#-]?\s*([A-Z0-9._/-]{4,})/i]);
+  if (salesOrderValue) blockedQuantityValues.add(normalizeQuantityCandidate(salesOrderValue));
+
+  const quantityCandidates: string[] = [];
+  const addQuantityCandidate = (value?: string) => {
+    if (!value) return;
+    const candidate = normalizeQuantityCandidate(value);
+    if (!candidate || blockedQuantityValues.has(candidate)) return;
+    if (/^[0-9]{5,7}$/.test(candidate)) return;
+    quantityCandidates.push(candidate);
+  };
+
+  addQuantityCandidate(firstMatch(joined, [/(?:quantity|qty)\s*[:#-]?\s*([0-9]+\.[0-9]{2}\s*(?:ea|pcs?|pieces?)?)/i]));
+
+  const headerIndex = lines.findIndex((line) => /work\s*order.*due.*quantity.*(?:uo|u\/o|unit|ship\s*quantity)/i.test(line));
+  const dataLine = headerIndex >= 0 ? lines[headerIndex + 1] ?? '' : '';
+  if (dataLine) {
+    const qtyUoMatch = dataLine.match(/\b([0-9]+\.[0-9]{2})\s+([A-Z]{1,4})\b/);
+    if (qtyUoMatch) addQuantityCandidate(`${qtyUoMatch[1]} ${qtyUoMatch[2]}`);
+    const qtyDecimal = dataLine.match(/\b([0-9]+\.[0-9]{2})\b/);
+    if (qtyDecimal) addQuantityCandidate(qtyDecimal[1]);
   }
+
+  addQuantityCandidate(firstMatch(joined, [/(?:quantity|qty)\s*[:#-]?\s*([0-9]+\s*(?:ea|pcs?|pieces?))/i]));
+  addQuantityCandidate(firstMatch(joined, [/(?:quantity|qty)\s*[:#-]?\s*([0-9]+)/i]));
+
+  const quantity = quantityCandidates[0] ?? '';
 
   const operation = firstMatch(joined, [
     /(?:operation|op\.?|router\s*step)\s*[:#-]?\s*([0-9]{3,6}\s*[A-Z0-9 /.-]{0,28})/i,
