@@ -2,6 +2,14 @@
 
 import { useMemo, useRef, useState } from 'react';
 
+declare global {
+  interface Window {
+    Tesseract?: {
+      recognize: (image: File | string, lang?: string) => Promise<{ data: { text: string } }>;
+    };
+  }
+}
+
 
 
 type WocData = {
@@ -189,6 +197,8 @@ export default function Home() {
   const [data, setData] = useState<WocData>(blank);
   const [imageUrl, setImageUrl] = useState('');
   const [selectedFileName, setSelectedFileName] = useState('');
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [ocrLoading, setOcrLoading] = useState(false);
   const [routerText, setRouterText] = useState('');
   const [showDraft, setShowDraft] = useState(false);
   const [checks, setChecks] = useState<boolean[]>(Array(5).fill(false));
@@ -236,6 +246,58 @@ export default function Home() {
     setStatus('Router text extracted. Verify every field before generating the draft.');
   };
 
+
+
+  const loadTesseractScript = async () => {
+    if (window.Tesseract) return;
+
+    await new Promise<void>((resolve, reject) => {
+      const existing = document.querySelector('script[data-tesseract="true"]') as HTMLScriptElement | null;
+      if (existing) {
+        existing.addEventListener('load', () => resolve(), { once: true });
+        existing.addEventListener('error', () => reject(new Error('Failed to load OCR script.')), { once: true });
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      script.async = true;
+      script.dataset.tesseract = 'true';
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load OCR script.'));
+      document.body.appendChild(script);
+    });
+  };
+
+  const extractTextFromPhoto = async () => {
+    if (!selectedImageFile || ocrLoading) return;
+
+    setOcrLoading(true);
+    setStatus('Reading work order photo...');
+
+    try {
+      await loadTesseractScript();
+      if (!window.Tesseract) throw new Error('OCR runtime unavailable.');
+
+      const result = await window.Tesseract.recognize(selectedImageFile, 'eng');
+      const text = result.data.text?.trim() || '';
+      setRouterText(text);
+
+      if (text.length < 20) {
+        setStatus('Could not read enough text from this photo. Try a clearer photo or enter fields manually.');
+        return;
+      }
+
+      const extracted = extractRouterData(text, data);
+      setData(extracted);
+      setChecks(Array(5).fill(false));
+      setStatus('Text extracted from photo. Review fields before sending.');
+    } catch (_error) {
+      setStatus('Could not read enough text from this photo. Try a clearer photo or enter fields manually.');
+    } finally {
+      setOcrLoading(false);
+    }
+  };
   const applyWeldingTimeTemplate = () => {
     const currentRate = data.currentListedRate || '33 parts per hour';
     const baseline = data.observedBaseline || '12.5 parts per hour';
@@ -403,11 +465,13 @@ ${emailBody}`;
 
     setSelectedFileName(file.name);
     if (file.type.startsWith('image/')) {
+      setSelectedImageFile(file);
       setImageUrl(URL.createObjectURL(file));
       setStatus('Photo is saved as evidence. To auto-fill fields, paste copied/OCR text here or enter fields manually.');
       return;
     }
 
+    setSelectedImageFile(null);
     setImageUrl('');
     setStatus('Attachment added. To auto-fill fields, paste copied/OCR text here or enter fields manually.');
   };
@@ -584,6 +648,14 @@ ${emailBody}`;
           </span>
         </button>
         {imageUrl ? <img className="preview" src={imageUrl} alt="Uploaded work order preview" /> : null}
+        <button
+          type="button"
+          className="secondary"
+          disabled={!selectedImageFile || ocrLoading}
+          onClick={extractTextFromPhoto}
+        >
+          {ocrLoading ? 'Extracting Text…' : 'Extract Text From Photo'}
+        </button>
         {!imageUrl && selectedFileName ? <p className="mini-note">Selected file: {selectedFileName}</p> : null}
         <div className="quick-entry-card">
           <h3>Quick Entry</h3>
