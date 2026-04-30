@@ -398,8 +398,9 @@ export default function Home() {
       } else {
         setStatus('AI Vision extracted header fields. Verify before generating draft.');
       }
-    } catch (_error) {
-      setStatus('AI Vision extraction failed. Try Basic OCR Fallback or enter fields manually.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'AI Vision extraction failed.';
+      setStatus(`${message} Try Basic OCR Fallback or enter fields manually.`);
     } finally {
       setVisionLoading(false);
     }

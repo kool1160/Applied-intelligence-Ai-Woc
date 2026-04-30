@@ -42,6 +42,49 @@ const emptyResult: VisionResult = {
   needsReview: [],
 };
 
+function safeErrorMessage(error: unknown) {
+  if (typeof error === 'string' && error.trim()) {
+    return error
+      .replace(/sk-[A-Za-z0-9_-]+/g, '[redacted-key]')
+      .replace(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/g, '[redacted-image-data]')
+      .trim();
+  }
+  if (!error || typeof error !== 'object') return 'OpenAI request failed.';
+  const candidate = 'message' in error ? error.message : '';
+  if (typeof candidate !== 'string' || !candidate.trim()) return 'OpenAI request failed.';
+
+  return candidate
+    .replace(/sk-[A-Za-z0-9_-]+/g, '[redacted-key]')
+    .replace(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/g, '[redacted-image-data]')
+    .trim();
+}
+
+function extractResponseText(payload: unknown) {
+  if (!payload || typeof payload !== 'object') return '';
+  const value = payload as {
+    output_text?: unknown;
+    output?: Array<{ content?: Array<{ type?: string; text?: string; value?: string }> }>;
+  };
+
+  if (typeof value.output_text === 'string' && value.output_text.trim()) {
+    return value.output_text.trim();
+  }
+
+  if (!Array.isArray(value.output)) return '';
+  for (const item of value.output) {
+    if (!item || !Array.isArray(item.content)) continue;
+    for (const contentItem of item.content) {
+      if (!contentItem || typeof contentItem !== 'object') continue;
+      const text = typeof contentItem.text === 'string' ? contentItem.text : '';
+      const valueText = typeof contentItem.value === 'string' ? contentItem.value : '';
+      if (text.trim()) return text.trim();
+      if (valueText.trim()) return valueText.trim();
+    }
+  }
+
+  return '';
+}
+
 function sanitizeResult(raw: unknown): VisionResult {
   const value = (raw && typeof raw === 'object') ? raw as Record<string, unknown> : {};
   const cleanText = (input: unknown) => typeof input === 'string' ? input.trim() : '';
@@ -73,71 +116,90 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const image = formData.get('image');
 
+    if (image == null) {
+      return NextResponse.json({ error: 'Missing image upload.' }, { status: 400 });
+    }
+
     if (!(image instanceof File)) {
-      return NextResponse.json({ error: 'Image file is required.' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid image payload.' }, { status: 400 });
     }
 
     if (!image.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'Only image uploads are supported.' }, { status: 400 });
+      return NextResponse.json({ error: 'Uploaded file must be an image.' }, { status: 400 });
     }
 
     const bytes = Buffer.from(await image.arrayBuffer());
     const dataUrl = `data:${image.type};base64,${bytes.toString('base64')}`;
 
-    const openAiResponse = await fetch('https://api.openai.com/v1/responses', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        input: [
-          {
-            role: 'user',
-            content: [
-              { type: 'input_text', text: visionPrompt },
-              { type: 'input_image', image_url: dataUrl },
-            ],
-          },
-        ],
-        text: {
-          format: {
-            type: 'json_schema',
-            name: 'router_header_extraction',
-            schema: {
-              type: 'object',
-              additionalProperties: false,
-              properties: {
-                workOrder: { type: 'string' },
-                partNumber: { type: 'string' },
-                revision: { type: 'string' },
-                customer: { type: 'string' },
-                quantity: { type: 'string' },
-                salesOrder: { type: 'string' },
-                customerPo: { type: 'string' },
-                cadDrawing: { type: 'string' },
-                confidence: { type: 'number' },
-                needsReview: { type: 'array', items: { type: 'string' } },
-              },
-              required: ['workOrder', 'partNumber', 'revision', 'customer', 'quantity', 'salesOrder', 'customerPo', 'cadDrawing', 'confidence', 'needsReview'],
-            },
-            strict: true,
-          },
+    let openAiResponse: Response;
+    try {
+      openAiResponse = await fetch('https://api.openai.com/v1/responses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
         },
-      }),
-    });
+        body: JSON.stringify({
+          model: MODEL,
+          input: [
+            {
+              role: 'user',
+              content: [
+                { type: 'input_text', text: visionPrompt },
+                { type: 'input_image', image_url: dataUrl },
+              ],
+            },
+          ],
+          text: {
+            format: {
+              type: 'json_schema',
+              name: 'router_header_extraction',
+              schema: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                  workOrder: { type: 'string' },
+                  partNumber: { type: 'string' },
+                  revision: { type: 'string' },
+                  customer: { type: 'string' },
+                  quantity: { type: 'string' },
+                  salesOrder: { type: 'string' },
+                  customerPo: { type: 'string' },
+                  cadDrawing: { type: 'string' },
+                  confidence: { type: 'number' },
+                  needsReview: { type: 'array', items: { type: 'string' } },
+                },
+                required: ['workOrder', 'partNumber', 'revision', 'customer', 'quantity', 'salesOrder', 'customerPo', 'cadDrawing', 'confidence', 'needsReview'],
+              },
+              strict: true,
+            },
+          },
+        }),
+      });
+    } catch (error) {
+      return NextResponse.json({ error: `OpenAI request failure: ${safeErrorMessage(error)}` }, { status: 502 });
+    }
 
     if (!openAiResponse.ok) {
       const errText = await openAiResponse.text();
-      return NextResponse.json({ error: `OpenAI request failed: ${errText}` }, { status: 502 });
+      return NextResponse.json({ error: `OpenAI request failure: ${safeErrorMessage(errText)}` }, { status: 502 });
     }
 
-    const payload = await openAiResponse.json() as { output_text?: string };
-    const raw = payload.output_text ? JSON.parse(payload.output_text) : emptyResult;
+    const payload = await openAiResponse.json();
+    const responseText = extractResponseText(payload);
+    if (!responseText) {
+      return NextResponse.json({ error: 'OpenAI response did not include extraction text.' }, { status: 502 });
+    }
+
+    let raw: unknown = emptyResult;
+    try {
+      raw = JSON.parse(responseText);
+    } catch {
+      return NextResponse.json({ error: 'Unable to parse extraction JSON from OpenAI response.' }, { status: 502 });
+    }
 
     return NextResponse.json(sanitizeResult(raw));
-  } catch (_error) {
-    return NextResponse.json({ error: 'Vision extraction failed.' }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
   }
 }
