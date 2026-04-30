@@ -196,7 +196,6 @@ export default function Home() {
   const [sending, setSending] = useState(false);
   const [history, setHistory] = useState<SubmissionRecord[]>([]);
   const [nextWocId, setNextWocId] = useState(1);
-  const [ocrRunning, setOcrRunning] = useState(false);
 
   const setField = (field: keyof WocData, value: string) => {
     setData((current) => ({ ...current, [field]: value }));
@@ -228,7 +227,7 @@ export default function Home() {
 
   const extractData = () => {
     if (!routerText.trim()) {
-      setStatus('Capture or upload the work order, then paste copied/OCR router text here for auto-fill. Manual entry still works.');
+      setStatus('Photo is saved as evidence. To auto-fill fields, paste copied/OCR text here or enter fields manually.');
       return;
     }
 
@@ -399,49 +398,18 @@ ${emailBody}`;
 
   const allConfirmed = checks.every(Boolean);
 
-  const runOcrFromImage = async (file: File) => {
-    setStatus('Reading work order image...');
-    setOcrRunning(true);
-
-    try {
-      const detectorCtor = (window as typeof window & { TextDetector?: new () => { detect: (image: ImageBitmap) => Promise<Array<{ rawValue?: string }>> } }).TextDetector;
-
-      if (!detectorCtor) {
-        setStatus('OCR could not reliably read this image. Enter or paste text manually.');
-        return;
-      }
-
-      const imageBitmap = await createImageBitmap(file);
-      const detector = new detectorCtor();
-      const blocks = await detector.detect(imageBitmap);
-      const extracted = blocks.map((block) => block.rawValue ?? '').join('\n').trim();
-
-      if (!extracted) {
-        setStatus('OCR could not reliably read this image. Enter or paste text manually.');
-        return;
-      }
-
-      setRouterText(extracted);
-      setStatus('OCR text extracted. Review fields before sending.');
-    } catch {
-      setStatus('OCR could not reliably read this image. Enter or paste text manually.');
-    } finally {
-      setOcrRunning(false);
-    }
-  };
-
-  const onWorkOrderFileSelected = async (file?: File) => {
+  const onWorkOrderFileSelected = (file?: File) => {
     if (!file) return;
 
     setSelectedFileName(file.name);
     if (file.type.startsWith('image/')) {
       setImageUrl(URL.createObjectURL(file));
-      await runOcrFromImage(file);
+      setStatus('Photo is saved as evidence. To auto-fill fields, paste copied/OCR text here or enter fields manually.');
       return;
     }
 
     setImageUrl('');
-    setStatus('OCR could not reliably read this image. Enter or paste text manually.');
+    setStatus('Attachment added. To auto-fill fields, paste copied/OCR text here or enter fields manually.');
   };
   const hasPartNumber = Boolean(data.partNumber.trim());
   const hasWorkOrder = Boolean(data.workOrder.trim());
@@ -581,7 +549,7 @@ ${emailBody}`;
           <p>Step 1</p>
           <h2>Capture Work Order</h2>
         </div>
-        <p className="mini-note">Use the camera/upload to auto-read router text when possible. If OCR is unclear, paste or type router text manually, then verify before sending.</p>
+        <p className="mini-note">Photo is saved as evidence. To auto-fill fields, paste copied/OCR text here or enter fields manually.</p>
         <input
           ref={takePhotoInputRef}
           className="capture-input-hidden"
@@ -625,10 +593,9 @@ ${emailBody}`;
             placeholder="Paste copied text from the work order here. Example: WO 042631-001, Part CYM-1750-LH-BU, Operation 003000 L WD10, Rate 33 parts per hour..."
           />
         </label>
-        {ocrRunning ? <p className="mini-note">Reading work order image...</p> : null}
         <div className="button-row">
-          <button type="button" className="secondary" onClick={extractData} disabled={ocrRunning}>
-            Extract Data
+          <button type="button" className="secondary" onClick={extractData}>
+            Extract From Text
           </button>
           <button type="button" onClick={loadSample}>Load Sample</button>
         </div>
@@ -717,7 +684,6 @@ ${emailBody}`;
                 {label}
               </label>
             ))}
-            {ocrRunning ? <p className="mini-note">Reading work order image...</p> : null}
         <div className="button-row">
               <button type="button" className="secondary" onClick={() => copyText(report)}>Copy Report</button>
               <button type="button" className="secondary" onClick={() => copyText(emailDraft)}>Copy Email</button>
