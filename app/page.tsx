@@ -186,12 +186,14 @@ export default function Home() {
   const uploadInputRef = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<WocData>(blank);
   const [imageUrl, setImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [selectedFileName, setSelectedFileName] = useState('');
   const [routerText, setRouterText] = useState('');
   const [showDraft, setShowDraft] = useState(false);
   const [checks, setChecks] = useState<boolean[]>(Array(5).fill(false));
   const [status, setStatus] = useState('');
   const [sending, setSending] = useState(false);
+  const [ocrRunning, setOcrRunning] = useState(false);
   const [history, setHistory] = useState<SubmissionRecord[]>([]);
   const [nextWocId, setNextWocId] = useState(1);
 
@@ -401,13 +403,48 @@ ${emailBody}`;
 
     setSelectedFileName(file.name);
     if (file.type.startsWith('image/')) {
+      setImageFile(file);
       setImageUrl(URL.createObjectURL(file));
       return;
     }
 
+    setImageFile(null);
     setImageUrl('');
   };
   const readyToDraft = Boolean(data.workOrder && data.partNumber && data.operation && data.process && data.category && data.problemSummary && data.requestedAction);
+
+  const runOcr = async () => {
+    if (!imageUrl) {
+      setStatus('Take or upload a work order photo first, then run OCR. Manual entry is always available.');
+      return;
+    }
+
+    setOcrRunning(true);
+    setStatus('Reading work order image...');
+
+    try {
+      if (!imageFile || typeof window === 'undefined' || !('TextDetector' in window)) {
+        setStatus('OCR could not reliably read this image. Enter or paste text manually.');
+        return;
+      }
+
+      const detector = new (window as typeof window & { TextDetector: new () => { detect: (source: ImageBitmapSource) => Promise<Array<{ rawValue: string }>> } }).TextDetector();
+      const bitmap = await createImageBitmap(imageFile);
+      const blocks = await detector.detect(bitmap);
+      const extractedText = blocks.map((item) => item.rawValue).join('\n').trim();
+      if (!extractedText || extractedText.length < 20) {
+        setStatus('OCR could not reliably read this image. Enter or paste text manually.');
+        return;
+      }
+
+      setRouterText(extractedText);
+      setStatus('OCR text extracted. Review fields before sending.');
+    } catch {
+      setStatus('OCR could not reliably read this image. Enter or paste text manually.');
+    } finally {
+      setOcrRunning(false);
+    }
+  };
 
   const copyText = async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -557,6 +594,13 @@ ${emailBody}`;
           <span>
             <strong>Upload File / Picture</strong>
             <small>Select image or PDF from Photo Library or Files.</small>
+          </span>
+        </button>
+        <button type="button" className="capture-trigger secondary" onClick={runOcr} disabled={!imageUrl || ocrRunning}>
+          <span className="glass-icon-tile">🔎</span>
+          <span>
+            <strong>{ocrRunning ? 'Reading work order image...' : 'Run OCR'}</strong>
+            <small>Extract text from the photo into the router text box.</small>
           </span>
         </button>
         {imageUrl ? <img className="preview" src={imageUrl} alt="Uploaded work order preview" /> : null}
