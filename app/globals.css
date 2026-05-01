@@ -444,6 +444,41 @@ button.secondary {
 
 button:disabled { opacity: 0.45; }
 .button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vision-status-card {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(202, 209, 217, 0.3);
+  background: rgba(12, 14, 19, 0.88);
+}
+
+.vision-status-card p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vision-status-card dl {
+  margin: 8px 0 0;
+  display: grid;
+  gap: 4px;
+}
+
+.vision-status-card dl div {
+  display: grid;
+  grid-template-columns: 94px 1fr;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.vision-status-card dt {
+  color: var(--muted);
+}
+
+.vision-status-card dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
 
 .preview {
   width: 100%;
