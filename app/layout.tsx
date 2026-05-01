@@ -4,6 +4,7 @@ import './woc.css';
 import './responsive-polish.css';
 import './status-toast.css';
 import './mobile-ui-fixes.css';
+import './mobile-ui-tighten.css';
 
 export const metadata: Metadata = {
   title: 'REFAB Connect',
