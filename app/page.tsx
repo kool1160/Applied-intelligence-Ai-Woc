@@ -252,6 +252,46 @@ function extractRouterData(source: string, existing: WocData): WocData {
   };
 }
 
+async function prepareImageForVision(file: File): Promise<File> {
+  let objectUrl = '';
+  try {
+    objectUrl = URL.createObjectURL(file);
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('Unable to load image for vision preparation.'));
+      img.src = objectUrl;
+    });
+
+    const maxSide = 1600;
+    const longestSide = Math.max(image.width, image.height);
+    const scale = longestSide > maxSide ? maxSide / longestSide : 1;
+    const targetWidth = Math.max(1, Math.round(image.width * scale));
+    const targetHeight = Math.max(1, Math.round(image.height * scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      return file;
+    }
+
+    context.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob((result) => resolve(result), 'image/jpeg', 0.85);
+    });
+
+    if (!blob) return file;
+    return new File([blob], 'vision-header.jpg', { type: 'image/jpeg' });
+  } catch {
+    return file;
+  } finally {
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+  }
+}
+
 export default function Home() {
   const takePhotoInputRef = useRef<HTMLInputElement>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
@@ -380,8 +420,10 @@ export default function Home() {
     setStatus('Extracting header with AI Vision...');
 
     try {
+      setVisionDebugMessage('Preparing image for AI Vision...');
+      const imageForVision = await prepareImageForVision(selectedImageFile);
       const formData = new FormData();
-      formData.append('image', selectedImageFile);
+      formData.append('image', imageForVision);
       setVisionDebugMessage('Sending image to backend...');
 
       const response = await fetch('/api/extract-vision', {
