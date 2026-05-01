@@ -24,11 +24,12 @@ type WocData = {
   currentListedRate: string;
   observedBaseline: string;
   issueType: string;
+  correctionType: string;
   category: string;
   priority: string;
   problemSummary: string;
   requestedAction: string;
-  correctionTemplate: string;
+  optionalNote: string;
 };
 
 type SubmissionRecord = {
@@ -62,12 +63,13 @@ const blank: WocData = {
   process: '',
   currentListedRate: '',
   observedBaseline: '',
-  issueType: 'Incorrect Time',
+  issueType: 'Incorrect Time / Rate',
+  correctionType: 'Incorrect Time / Rate',
   category: '',
   priority: 'Medium',
   problemSummary: '',
   requestedAction: '',
-  correctionTemplate: 'Other/manual',
+  optionalNote: '',
 };
 
 const confirmationLabels = [
@@ -93,40 +95,23 @@ const navItems = [
   ['⚙', 'More', '#more'],
 ];
 
-const issueOptions = [
-  'Incorrect Time',
-  'Missing Information',
-  'Missing Operation',
-  'Missing Fixture Callout',
-  'Wrong Routing',
-  'Missing Setup Time',
-  'Missing Grind / Finish Time',
+const correctionTypeOptions = [
+  'Incorrect Time / Rate',
+  'Missing Grind / Finish Operation',
+  'Missing Weld Operation',
+  'Missing Fixture / Work Instruction',
+  'Wrong / Missing Router Step',
   'Other',
 ];
 
-
-const correctionTemplateOptions = [
-  'Welding time correction',
-  'Missing grinding operation',
-  'Missing welding operation',
-  'Missing fixture callout',
-  'Wrong operation/process',
-  'Missing setup time',
-  'Missing finish/polish time',
-  'Incorrect quantity/routing info',
-  'Other/manual',
-];
-
 const operationProcessOptions = [
-  'CT10 – Laser Cut',
-  'RW10 – Cobot Welder',
-  'WD10 – Welding',
-  'QC10 – Inspection',
-  'FM10 – Forming',
-  'Grinding',
-  'Polishing / Finish',
+  'Welding',
+  'Cobot Welding',
+  'Grinding / Finish',
+  'Laser / Forming',
+  'Inspection / Quality',
   'Fixture / Setup',
-  'Other/manual',
+  'Other',
 ];
 
 const currentConditionOptions = [
@@ -370,12 +355,13 @@ export default function Home() {
       process: 'WELDING',
       currentListedRate: '33 parts per hour',
       observedBaseline: '12.5 parts per hour',
-      issueType: 'Incorrect Time',
+      issueType: 'Incorrect Time / Rate',
+      correctionType: 'Incorrect Time / Rate',
       category: 'Welding',
       priority: 'High',
       problemSummary: 'The current listed welding rate of 33 parts per hour is not obtainable or sustainable under actual production conditions.',
-      requestedAction: 'Please review and update the welding runtime/rate from 33 parts per hour to a sustainable baseline of 12.5 parts per hour, or establish the correct Engineering-approved welding time.',
-      correctionTemplate: 'Welding time correction',
+      requestedAction: 'Please review and update the router time/rate from 33 parts per hour to 12.5 parts per hour, or establish the correct Engineering-approved time.',
+      optionalNote: '',
     });
     setShowDraft(false);
     setChecks(Array(5).fill(false));
@@ -508,51 +494,55 @@ export default function Home() {
   };
 
 
-  const applyTemplate = (templateName: string) => {
+  const applyCorrectionType = (typeName: string) => {
     setData((current) => {
       const currentRate = current.currentListedRate || '[CURRENT RATE]';
-      const baseline = current.observedBaseline || '[OBSERVED BASELINE]';
-      const operation = current.operation || '[OPERATION]';
+      const correctRate = current.observedBaseline || '[CORRECT RATE]';
+      const process = current.process || '[OPERATION/PROCESS]';
+      const optionalNoteSuffix = current.optionalNote.trim() ? ` Note: ${current.optionalNote.trim()}` : '';
 
       const templateMap: Record<string, Partial<WocData>> = {
-        'Welding time correction': {
-          issueType: 'Incorrect Time',
-          category: current.category || 'Welding',
-          priority: 'High',
-          problemSummary: `The current listed welding rate of ${currentRate} is not obtainable or sustainable under actual production conditions. A more balanced observed baseline is ${baseline}.`,
-          requestedAction: `Please review and update the welding runtime/rate from ${currentRate} to a sustainable baseline of ${baseline}, or establish the correct Engineering-approved welding time.`,
+        'Incorrect Time / Rate': {
+          correctionType: 'Incorrect Time / Rate',
+          issueType: 'Incorrect Time / Rate',
+          problemSummary: 'The current listed rate is not obtainable or sustainable under actual production conditions.',
+          requestedAction: `Please review and update the router time/rate from ${currentRate} to ${correctRate}, or establish the correct Engineering-approved time.`,
         },
-        'Missing grinding operation': {
-          issueType: 'Missing Operation',
-          problemSummary: 'The router is missing a required grinding operation for this work order/part.',
-          requestedAction: `Please add a grinding operation to the router with a reviewed production baseline of ${baseline}, or establish the correct Engineering-approved grinding time.`,
+        'Missing Grind / Finish Operation': {
+          correctionType: 'Missing Grind / Finish Operation',
+          issueType: 'Missing Grind / Finish Operation',
+          problemSummary: 'The router is missing a required grind/finish operation for this work order/part.',
+          requestedAction: `Please add a grind/finish operation to the router with a reviewed production baseline of ${correctRate}, or establish the correct Engineering-approved grind/finish time.${optionalNoteSuffix}`,
         },
-        'Missing welding operation': {
-          issueType: 'Missing Operation',
+        'Missing Weld Operation': {
+          correctionType: 'Missing Weld Operation',
+          issueType: 'Missing Weld Operation',
           problemSummary: 'The router is missing a required welding operation for this work order/part.',
-          requestedAction: 'Please review the router and add the missing welding operation with the correct Engineering-approved welding time.',
+          requestedAction: `Please add the missing welding operation and establish the correct Engineering-approved welding time.${optionalNoteSuffix}`,
         },
-        'Missing fixture callout': {
-          issueType: 'Missing Fixture Callout',
-          problemSummary: 'The router does not clearly identify the required fixture or holding method for this operation.',
-          requestedAction: 'Please add the required fixture/callout or holding instruction to the router so the job can be set up consistently.',
+        'Missing Fixture / Work Instruction': {
+          correctionType: 'Missing Fixture / Work Instruction',
+          issueType: 'Missing Fixture / Work Instruction',
+          problemSummary: 'The router does not clearly identify the required fixture, holding method, or work instruction for this operation.',
+          requestedAction: `Please add the required fixture, holding method, or work instruction to the router so the job can be set up consistently.${optionalNoteSuffix}`,
         },
-        'Wrong operation/process': {
-          issueType: 'Wrong Routing',
-          problemSummary: 'The current router operation/process appears incorrect for the required work content.',
-          requestedAction: `Please review the router and add the missing operation: ${operation}.`,
+        'Wrong / Missing Router Step': {
+          correctionType: 'Wrong / Missing Router Step',
+          issueType: 'Wrong / Missing Router Step',
+          problemSummary: 'The router step appears incorrect, missing, or unclear for the required work content.',
+          requestedAction: `Please review and correct the router step for ${process}.${optionalNoteSuffix}`,
         },
       };
 
       return {
         ...current,
-        correctionTemplate: templateName,
-        ...(templateMap[templateName] || {}),
+        correctionType: typeName,
+        ...(templateMap[typeName] || { issueType: typeName }),
       };
     });
     setShowDraft(false);
     setChecks(Array(5).fill(false));
-    setStatus(`${templateName} template applied. You can edit any field.`);
+    setStatus(`${typeName} selected. You can edit any field.`);
   };
 
   const today = new Date().toLocaleDateString();
@@ -561,10 +551,10 @@ export default function Home() {
     return `ENGINEERING WORK ORDER CORRECTION REPORT
 
 Title:
-${data.workOrder || '[WO REQUIRED]'} / ${data.partNumber || '[PART REQUIRED]'} – ${data.issueType} Correction Request
+${data.workOrder || '[WO REQUIRED]'} / ${data.partNumber || '[PART REQUIRED]'} – ${data.correctionType} Correction Request
 
 Correction Type:
-${data.issueType}
+${data.correctionType}
 
 Category:
 ${data.category || '[CATEGORY REQUIRED]'}
@@ -637,8 +627,8 @@ ${today}`;
 
   const emailSubject = useMemo(() => {
     const category = (data.category || 'CATEGORY TBD').toUpperCase();
-    return `[AI-WOC][${category}] WO ${data.workOrder || 'TBD'} | ${data.partNumber || 'PART TBD'} | ${data.issueType}`;
-  }, [data.category, data.issueType, data.partNumber, data.workOrder]);
+    return `[AI-WOC][${category}] WO ${data.workOrder || 'TBD'} | ${data.partNumber || 'PART TBD'} | ${data.correctionType}`;
+  }, [data.category, data.correctionType, data.partNumber, data.workOrder]);
 
   const emailBody = useMemo(() => {
     return `Engineering Team,
@@ -718,7 +708,7 @@ ${emailBody}`;
     hasIdentifier
     && data.category.trim()
     && data.priority.trim()
-    && data.issueType.trim()
+    && data.correctionType.trim()
     && data.problemSummary.trim()
     && data.requestedAction.trim(),
   );
@@ -746,7 +736,7 @@ ${emailBody}`;
 
   const sendEmail = async () => {
     if (!readyToDraft) {
-      setStatus('Required fields are missing. Add Part Number or Work Order Number, plus Category, Priority, Issue Type, Problem Summary, and Requested Engineering Action before sending.');
+      setStatus('Required fields are missing. Add Part Number or Work Order Number, plus Category, Priority, Correction Type, Problem Summary, and Requested Engineering Action before sending.');
       return;
     }
 
@@ -777,7 +767,7 @@ ${emailBody}`;
         workOrderNumber: data.workOrder || '',
         partNumber: data.partNumber || '',
         departmentProcess: `${data.department || '[N/A]'} / ${data.process || '[N/A]'}`,
-        issueType: data.issueType,
+        issueType: data.correctionType,
         category: data.category,
         priority: data.priority,
         requestedAction: data.requestedAction,
@@ -962,15 +952,9 @@ ${emailBody}`;
               </select>
             </label>
             <label>
-              Correction Template
-              <select value={data.correctionTemplate} onChange={(event) => applyTemplate(event.target.value)}>
-                {correctionTemplateOptions.map((item) => <option key={item}>{item}</option>)}
-              </select>
-            </label>
-            <label>
-              Issue Type
-              <select value={data.issueType} onChange={(event) => setField('issueType', event.target.value)}>
-                {issueOptions.map((item) => <option key={item}>{item}</option>)}
+              Correction Type
+              <select value={data.correctionType} onChange={(event) => applyCorrectionType(event.target.value)}>
+                {correctionTypeOptions.map((item) => <option key={item}>{item}</option>)}
               </select>
             </label>
             <label>
@@ -1040,23 +1024,32 @@ ${emailBody}`;
           <p>Step 3</p>
           <h2>State Issue</h2>
         </div>
-        <div className="template-card">
-          <strong>Fast template</strong>
-          <p>Use this for the current welding time issue: listed at 33/hour, observed balanced baseline at 12.5/hour.</p>
-          <button type="button" className="secondary" onClick={() => applyTemplate('Welding time correction')}>Apply Welding Time Issue</button>
-        </div>
         <label>
-          Correction Template
-          <select value={data.correctionTemplate} onChange={(event) => applyTemplate(event.target.value)}>
-            {correctionTemplateOptions.map((item) => <option key={item}>{item}</option>)}
+          Correction Type
+          <select value={data.correctionType} onChange={(event) => applyCorrectionType(event.target.value)}>
+            {correctionTypeOptions.map((item) => <option key={item}>{item}</option>)}
           </select>
         </label>
-        <label>
-          Issue Type
-          <select value={data.issueType} onChange={(event) => setField('issueType', event.target.value)}>
-            {issueOptions.map((item) => <option key={item}>{item}</option>)}
-          </select>
-        </label>
+        {data.correctionType === 'Incorrect Time / Rate' ? (
+          <>
+            <label>Current Listed Rate<input value={data.currentListedRate} onChange={(event) => setField('currentListedRate', event.target.value)} /></label>
+            <label>Correct / Observed Rate<input value={data.observedBaseline} onChange={(event) => setField('observedBaseline', event.target.value)} /></label>
+            <label>Operation / Process<select value={data.process} onChange={(event) => setField('process', event.target.value)}><option value="">Select operation / process</option>{operationProcessOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+          </>
+        ) : null}
+        {(data.correctionType === 'Missing Grind / Finish Operation' || data.correctionType === 'Missing Weld Operation') ? (
+          <>
+            <label>Correct / Observed Rate<input value={data.observedBaseline} onChange={(event) => setField('observedBaseline', event.target.value)} /></label>
+            <label>Optional note<textarea value={data.optionalNote} onChange={(event) => setField('optionalNote', event.target.value)} /></label>
+          </>
+        ) : null}
+        {data.correctionType === 'Missing Fixture / Work Instruction' ? <label>Optional note<textarea value={data.optionalNote} onChange={(event) => setField('optionalNote', event.target.value)} /></label> : null}
+        {data.correctionType === 'Wrong / Missing Router Step' ? (
+          <>
+            <label>Operation / Process<select value={data.process} onChange={(event) => setField('process', event.target.value)}><option value="">Select operation / process</option>{operationProcessOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label>Optional note<textarea value={data.optionalNote} onChange={(event) => setField('optionalNote', event.target.value)} /></label>
+          </>
+        ) : null}
         <label>
           Category
           <select value={data.category} onChange={(event) => setField('category', event.target.value)}>
