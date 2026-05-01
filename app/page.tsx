@@ -92,7 +92,6 @@ const workflow: [string, string, string, TaskView][] = [
 const navItems: [string, TaskView][] = [
   ['⌂', 'Home'],
   ['📷', 'Capture'],
-  ['🧩', 'Build Correction'],
   ['🗂', 'Drafts'],
   ['◷', 'History'],
   ['⚙', 'More'],
@@ -749,6 +748,7 @@ ${emailBody}`;
   const generateDraft = () => {
     setShowDraft(true);
     setChecks(Array(5).fill(false));
+    setActiveView('Drafts');
     setStatus(readyToDraft ? 'Draft generated. Confirm every checkbox before sending.' : 'Draft generated with missing fields. Fill bracketed items before confirming.');
   };
 
@@ -1011,6 +1011,9 @@ ${emailBody}`;
             Extract From Text
           </button>
           <button type="button" onClick={loadSample}>Load Sample</button>
+        </div>
+        <div className="button-row">
+          <button type="button" onClick={() => setActiveView('Build Correction')}>Continue to Build Correction</button>
         </div>
       </section>
       ) : null}
