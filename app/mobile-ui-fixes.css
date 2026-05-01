@@ -1,0 +1,317 @@
+/*
+  Mobile UI polish for REFAB Connect / AI-WOC.
+  Goal: fix the current iPhone screenshots without touching workflow logic.
+  Scope: safe-area spacing, compact glass dock, readable nav states, and cleaner mobile card rhythm.
+*/
+
+:root {
+  --dock-bg: rgba(7, 9, 13, 0.82);
+  --dock-glass: rgba(22, 25, 31, 0.78);
+  --dock-glass-active: rgba(111, 26, 32, 0.72);
+  --dock-border: rgba(232, 238, 246, 0.32);
+  --dock-muted: rgba(238, 242, 247, 0.74);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+/* Prevent the hero/header from sliding under the Dynamic Island / browser chrome. */
+.shell {
+  padding-top: max(18px, calc(env(safe-area-inset-top) + 16px));
+  padding-bottom: max(132px, calc(env(safe-area-inset-bottom) + 118px));
+}
+
+.top-card {
+  overflow: visible;
+  transform: translateZ(0);
+}
+
+.top-copy h1,
+.hero-card h2,
+.panel h2,
+.workflow-row h3,
+.stats-grid span,
+.stats-grid strong {
+  text-wrap: balance;
+}
+
+/* Keep the app header readable on narrow iPhones. */
+@media (max-width: 620px) {
+  .shell {
+    padding-top: max(48px, calc(env(safe-area-inset-top) + 14px));
+    padding-bottom: max(136px, calc(env(safe-area-inset-bottom) + 118px));
+  }
+
+  .top-card {
+    grid-template-columns: 78px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    padding: 14px;
+    border-radius: 26px;
+  }
+
+  .brand-tile {
+    width: 78px;
+    height: 78px;
+    border-radius: 20px;
+  }
+
+  .top-copy {
+    min-width: 0;
+  }
+
+  .top-copy h1 {
+    font-size: clamp(34px, 9.4vw, 44px);
+    line-height: 0.96;
+    letter-spacing: -0.055em;
+  }
+
+  .top-copy span {
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.2;
+  }
+
+  .system-pill {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: -2px;
+    padding-top: 0;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+  }
+
+  .system-pill span {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+@media (max-width: 390px) {
+  .shell {
+    padding-top: max(48px, calc(env(safe-area-inset-top) + 12px));
+  }
+
+  .top-card {
+    grid-template-columns: 70px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .brand-tile {
+    width: 70px;
+    height: 70px;
+  }
+
+  .top-copy h1 {
+    font-size: 32px;
+  }
+
+  .top-copy span {
+    font-size: 13px;
+  }
+
+  .system-pill {
+    font-size: 10.5px;
+  }
+}
+
+/* The dock in the screenshots was drifting into large white buttons. Force premium dark glass states. */
+.bottom-nav {
+  overflow: visible;
+  gap: 5px;
+  padding: 7px;
+  border-color: rgba(216, 225, 235, 0.34);
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 255, 255, 0.16), transparent 26%),
+    radial-gradient(circle at 50% 100%, rgba(209, 50, 57, 0.2), transparent 42%),
+    linear-gradient(180deg, rgba(38, 42, 50, 0.88), rgba(7, 9, 13, 0.94));
+  box-shadow:
+    0 -10px 32px rgba(0, 0, 0, 0.54),
+    0 0 30px rgba(208, 48, 56, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.72);
+}
+
+.bottom-nav button,
+.bottom-nav a {
+  margin: 0;
+  min-width: 0;
+  min-height: 54px;
+  padding: 6px 3px 5px;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  border: 1px solid rgba(236, 241, 247, 0.2);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(31, 35, 42, 0.82) 30%, rgba(7, 9, 13, 0.9));
+  color: var(--dock-muted);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.28),
+    0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.bottom-nav button.active,
+.bottom-nav a.active,
+.bottom-nav .active {
+  color: #ff6268;
+  border-color: rgba(247, 154, 158, 0.72);
+  background:
+    radial-gradient(circle at 50% 12%, rgba(255, 146, 151, 0.28), transparent 34%),
+    linear-gradient(180deg, rgba(121, 33, 41, 0.88), rgba(47, 25, 31, 0.86));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 0 24px rgba(209, 50, 57, 0.24),
+    0 0 20px rgba(209, 50, 57, 0.34),
+    0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.nav-icon,
+.bottom-nav .glass-icon-tile {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 10px;
+  color: rgba(246, 249, 252, 0.92);
+}
+
+.nav-icon::before {
+  color: rgba(246, 249, 252, 0.92);
+  text-shadow: 0 0 10px rgba(246, 249, 252, 0.28);
+}
+
+.bottom-nav button.active .nav-icon,
+.bottom-nav a.active .nav-icon,
+.bottom-nav .active .nav-icon {
+  color: #ffdadd;
+  border-color: rgba(255, 160, 164, 0.9);
+  box-shadow:
+    0 0 16px rgba(209, 50, 57, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.bottom-nav button.active::after,
+.bottom-nav a.active::after,
+.bottom-nav .active::after {
+  width: 5px;
+  height: 5px;
+  margin-top: -1px;
+  border-radius: 999px;
+  background: #ff4a50;
+  box-shadow: 0 0 12px rgba(255, 74, 80, 0.85);
+}
+
+@media (max-width: 620px) {
+  .bottom-nav {
+    left: 12px;
+    right: 12px;
+    bottom: max(10px, calc(env(safe-area-inset-bottom) + 8px));
+    padding: 6px;
+    border-radius: 24px;
+  }
+
+  .bottom-nav button,
+  .bottom-nav a {
+    min-height: 52px;
+    border-radius: 17px;
+    font-size: 10px;
+  }
+
+  .nav-icon,
+  .bottom-nav .glass-icon-tile {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+  }
+}
+
+/* Workflow cards should read like a guided list, not centered poster text. */
+.workflow-row {
+  min-height: 86px;
+  align-items: center;
+}
+
+.workflow-row > div {
+  min-width: 0;
+  text-align: left;
+}
+
+.workflow-row h3,
+.workflow-row p {
+  text-align: left;
+  text-wrap: balance;
+}
+
+.workflow-row h3 {
+  font-size: clamp(20px, 5vw, 28px);
+  line-height: 1.05;
+}
+
+.workflow-row p {
+  font-size: clamp(15px, 4vw, 19px);
+  line-height: 1.25;
+}
+
+.workflow-row b {
+  justify-self: end;
+}
+
+@media (max-width: 430px) {
+  .workflow-card,
+  .panel {
+    border-radius: 26px;
+  }
+
+  .workflow-row {
+    grid-template-columns: 58px minmax(0, 1fr) 24px;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 20px;
+  }
+
+  .step-box {
+    width: 54px;
+    height: 54px;
+    border-radius: 17px;
+  }
+
+  .workflow-row h3 {
+    font-size: 20px;
+  }
+
+  .workflow-row p {
+    font-size: 15px;
+  }
+
+  .workflow-row b {
+    font-size: 34px;
+  }
+}
+
+/* Reduce dense form feel on Capture without changing the actual fields or logic. */
+.quick-entry-card,
+.vision-status-card,
+.beta-checklist,
+input,
+select,
+textarea {
+  border-color: rgba(226, 233, 240, 0.25);
+}
+
+input,
+select,
+textarea {
+  min-height: 48px;
+}
+
+.capture-trigger {
+  border-color: rgba(226, 233, 240, 0.34);
+}
+
+button:disabled {
+  opacity: 0.5;
+  filter: saturate(0.8);
+}
