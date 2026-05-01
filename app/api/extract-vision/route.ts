@@ -128,6 +128,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Uploaded file must be an image.' }, { status: 400 });
     }
 
+    if (image.size > 10 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: 'Image is too large for AI Vision. Try a closer/cropped header photo.' },
+        { status: 413 },
+      );
+    }
+
     const bytes = Buffer.from(await image.arrayBuffer());
     const dataUrl = `data:${image.type};base64,${bytes.toString('base64')}`;
 
