@@ -261,6 +261,15 @@ export default function Home() {
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [ocrLoading, setOcrLoading] = useState(false);
   const [visionLoading, setVisionLoading] = useState(false);
+  const [visionDebugMessage, setVisionDebugMessage] = useState('');
+  const [lastVisionResult, setLastVisionResult] = useState<{
+    workOrder: string;
+    partNumber: string;
+    revision: string;
+    customer: string;
+    quantity: string;
+    needsReview: string[];
+  } | null>(null);
   const [routerText, setRouterText] = useState('');
   const [showDraft, setShowDraft] = useState(false);
   const [checks, setChecks] = useState<boolean[]>(Array(5).fill(false));
@@ -366,11 +375,14 @@ export default function Home() {
     if (!selectedImageFile || visionLoading) return;
 
     setVisionLoading(true);
+    setVisionDebugMessage('AI Vision started...');
+    setLastVisionResult(null);
     setStatus('Extracting header with AI Vision...');
 
     try {
       const formData = new FormData();
       formData.append('image', selectedImageFile);
+      setVisionDebugMessage('Sending image to backend...');
 
       const response = await fetch('/api/extract-vision', {
         method: 'POST',
@@ -392,6 +404,15 @@ export default function Home() {
         quantity: result.quantity || current.quantity,
       }));
       setChecks(Array(5).fill(false));
+      setLastVisionResult({
+        workOrder: result.workOrder || '',
+        partNumber: result.partNumber || result.cadDrawing || '',
+        revision: result.revision || '',
+        customer: result.customer || '',
+        quantity: result.quantity || '',
+        needsReview: Array.isArray(result.needsReview) ? result.needsReview : [],
+      });
+      setVisionDebugMessage('AI Vision success. Fields updated.');
 
       if (Array.isArray(result.needsReview) && result.needsReview.length) {
         setStatus(`AI Vision extracted header. Review: ${result.needsReview.join(', ')}.`);
@@ -400,6 +421,8 @@ export default function Home() {
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'AI Vision extraction failed.';
+      const safeMessage = message.replace(/\s+/g, ' ').trim().slice(0, 180);
+      setVisionDebugMessage(`AI Vision error: ${safeMessage}`);
       setStatus(`${message} Try Basic OCR Fallback or enter fields manually.`);
     } finally {
       setVisionLoading(false);
@@ -774,6 +797,21 @@ ${emailBody}`;
             {ocrLoading ? 'Extracting Text…' : 'Basic OCR Fallback'}
           </button>
         </div>
+        {visionDebugMessage ? (
+          <div className="vision-status-card" role="status" aria-live="polite">
+            <p>{visionDebugMessage}</p>
+            {lastVisionResult ? (
+              <dl>
+                <div><dt>Work Order</dt><dd>{lastVisionResult.workOrder || '—'}</dd></div>
+                <div><dt>Part Number</dt><dd>{lastVisionResult.partNumber || '—'}</dd></div>
+                <div><dt>Revision</dt><dd>{lastVisionResult.revision || '—'}</dd></div>
+                <div><dt>Customer</dt><dd>{lastVisionResult.customer || '—'}</dd></div>
+                <div><dt>Quantity</dt><dd>{lastVisionResult.quantity || '—'}</dd></div>
+                <div><dt>Needs Review</dt><dd>{lastVisionResult.needsReview.length ? lastVisionResult.needsReview.join(', ') : 'None'}</dd></div>
+              </dl>
+            ) : null}
+          </div>
+        ) : null}
         {!imageUrl && selectedFileName ? <p className="mini-note">Selected file: {selectedFileName}</p> : null}
         <div className="quick-entry-card">
           <h3>Quick Entry</h3>
