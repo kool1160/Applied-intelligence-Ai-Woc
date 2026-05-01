@@ -28,6 +28,7 @@ type WocData = {
   priority: string;
   problemSummary: string;
   requestedAction: string;
+  correctionTemplate: string;
 };
 
 type SubmissionRecord = {
@@ -66,6 +67,7 @@ const blank: WocData = {
   priority: 'Medium',
   problemSummary: '',
   requestedAction: '',
+  correctionTemplate: 'Other/manual',
 };
 
 const confirmationLabels = [
@@ -102,6 +104,39 @@ const issueOptions = [
   'Other',
 ];
 
+
+const correctionTemplateOptions = [
+  'Welding time correction',
+  'Missing grinding operation',
+  'Missing welding operation',
+  'Missing fixture callout',
+  'Wrong operation/process',
+  'Missing setup time',
+  'Missing finish/polish time',
+  'Incorrect quantity/routing info',
+  'Other/manual',
+];
+
+const operationProcessOptions = [
+  'CT10 – Laser Cut',
+  'RW10 – Cobot Welder',
+  'WD10 – Welding',
+  'QC10 – Inspection',
+  'FM10 – Forming',
+  'Grinding',
+  'Polishing / Finish',
+  'Fixture / Setup',
+  'Other/manual',
+];
+
+const currentConditionOptions = [
+  '0 / missing time',
+  'Incorrect rate',
+  'Missing operation',
+  'Missing setup',
+  'Missing fixture callout',
+  'Other/manual',
+];
 const categoryOptions = ['Welding', 'Machining', 'Fixtures', 'Routing', 'Material', 'Hardware', 'Quality', 'Other'];
 const priorityOptions = ['Low', 'Medium', 'High', 'Urgent'];
 
@@ -340,6 +375,7 @@ export default function Home() {
       priority: 'High',
       problemSummary: 'The current listed welding rate of 33 parts per hour is not obtainable or sustainable under actual production conditions.',
       requestedAction: 'Please review and update the welding runtime/rate from 33 parts per hour to a sustainable baseline of 12.5 parts per hour, or establish the correct Engineering-approved welding time.',
+      correctionTemplate: 'Welding time correction',
     });
     setShowDraft(false);
     setChecks(Array(5).fill(false));
@@ -471,25 +507,52 @@ export default function Home() {
     }
   };
 
-  const applyWeldingTimeTemplate = () => {
-    const currentRate = data.currentListedRate || '33 parts per hour';
-    const baseline = data.observedBaseline || '12.5 parts per hour';
 
-    setData((current) => ({
-      ...current,
-      department: current.department || 'Welding',
-      process: current.process || 'WELDING',
-      currentListedRate: current.currentListedRate || currentRate,
-      observedBaseline: current.observedBaseline || baseline,
-      issueType: 'Incorrect Time',
-      category: current.category || 'Welding',
-      priority: 'High',
-      problemSummary: `The current listed welding rate of ${currentRate} is not obtainable or sustainable under actual production conditions. A more balanced observed baseline is ${baseline}.`,
-      requestedAction: `Please review and update the welding runtime/rate from ${currentRate} to a sustainable baseline of ${baseline}, or establish the correct Engineering-approved welding time.`,
-    }));
+  const applyTemplate = (templateName: string) => {
+    setData((current) => {
+      const currentRate = current.currentListedRate || '[CURRENT RATE]';
+      const baseline = current.observedBaseline || '[OBSERVED BASELINE]';
+      const operation = current.operation || '[OPERATION]';
+
+      const templateMap: Record<string, Partial<WocData>> = {
+        'Welding time correction': {
+          issueType: 'Incorrect Time',
+          category: current.category || 'Welding',
+          priority: 'High',
+          problemSummary: `The current listed welding rate of ${currentRate} is not obtainable or sustainable under actual production conditions. A more balanced observed baseline is ${baseline}.`,
+          requestedAction: `Please review and update the welding runtime/rate from ${currentRate} to a sustainable baseline of ${baseline}, or establish the correct Engineering-approved welding time.`,
+        },
+        'Missing grinding operation': {
+          issueType: 'Missing Operation',
+          problemSummary: 'The router is missing a required grinding operation for this work order/part.',
+          requestedAction: `Please add a grinding operation to the router with a reviewed production baseline of ${baseline}, or establish the correct Engineering-approved grinding time.`,
+        },
+        'Missing welding operation': {
+          issueType: 'Missing Operation',
+          problemSummary: 'The router is missing a required welding operation for this work order/part.',
+          requestedAction: 'Please review the router and add the missing welding operation with the correct Engineering-approved welding time.',
+        },
+        'Missing fixture callout': {
+          issueType: 'Missing Fixture Callout',
+          problemSummary: 'The router does not clearly identify the required fixture or holding method for this operation.',
+          requestedAction: 'Please add the required fixture/callout or holding instruction to the router so the job can be set up consistently.',
+        },
+        'Wrong operation/process': {
+          issueType: 'Wrong Routing',
+          problemSummary: 'The current router operation/process appears incorrect for the required work content.',
+          requestedAction: `Please review the router and add the missing operation: ${operation}.`,
+        },
+      };
+
+      return {
+        ...current,
+        correctionTemplate: templateName,
+        ...(templateMap[templateName] || {}),
+      };
+    });
     setShowDraft(false);
     setChecks(Array(5).fill(false));
-    setStatus('Welding time correction template applied.');
+    setStatus(`${templateName} template applied. You can edit any field.`);
   };
 
   const today = new Date().toLocaleDateString();
@@ -899,6 +962,12 @@ ${emailBody}`;
               </select>
             </label>
             <label>
+              Correction Template
+              <select value={data.correctionTemplate} onChange={(event) => applyTemplate(event.target.value)}>
+                {correctionTemplateOptions.map((item) => <option key={item}>{item}</option>)}
+              </select>
+            </label>
+            <label>
               Issue Type
               <select value={data.issueType} onChange={(event) => setField('issueType', event.target.value)}>
                 {issueOptions.map((item) => <option key={item}>{item}</option>)}
@@ -945,7 +1014,22 @@ ${emailBody}`;
           {dataFields.map(([field, label]) => (
             <label key={field}>
               {label}
-              <input value={data[field]} onChange={(event) => setField(field, event.target.value)} />
+              {field === 'operation' || field === 'process' ? (
+                <select value={data[field]} onChange={(event) => setField(field, event.target.value)}>
+                  <option value="">Select or type manually below</option>
+                  {operationProcessOptions.map((item) => <option key={item}>{item}</option>)}
+                </select>
+              ) : field === 'currentListedRate' ? (
+                <>
+                  <select value={currentConditionOptions.includes(data.currentListedRate) ? data.currentListedRate : ''} onChange={(event) => setField('currentListedRate', event.target.value)}>
+                    <option value="">Current listed condition helper</option>
+                    {currentConditionOptions.map((item) => <option key={item}>{item}</option>)}
+                  </select>
+                  <input value={data[field]} onChange={(event) => setField(field, event.target.value)} />
+                </>
+              ) : (
+                <input value={data[field]} onChange={(event) => setField(field, event.target.value)} />
+              )}
             </label>
           ))}
         </div>
@@ -959,8 +1043,14 @@ ${emailBody}`;
         <div className="template-card">
           <strong>Fast template</strong>
           <p>Use this for the current welding time issue: listed at 33/hour, observed balanced baseline at 12.5/hour.</p>
-          <button type="button" className="secondary" onClick={applyWeldingTimeTemplate}>Apply Welding Time Issue</button>
+          <button type="button" className="secondary" onClick={() => applyTemplate('Welding time correction')}>Apply Welding Time Issue</button>
         </div>
+        <label>
+          Correction Template
+          <select value={data.correctionTemplate} onChange={(event) => applyTemplate(event.target.value)}>
+            {correctionTemplateOptions.map((item) => <option key={item}>{item}</option>)}
+          </select>
+        </label>
         <label>
           Issue Type
           <select value={data.issueType} onChange={(event) => setField('issueType', event.target.value)}>
