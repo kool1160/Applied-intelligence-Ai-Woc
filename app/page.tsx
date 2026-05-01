@@ -786,7 +786,19 @@ ${emailBody}`;
           <p>Step 1</p>
           <h2>Capture Work Order</h2>
         </div>
-        <p className="mini-note">Photo is saved as evidence. To auto-fill fields, paste copied/OCR text here or enter fields manually.</p>
+        <p className="mini-note">Photo is saved as evidence. To auto-fill fields, capture the full printed header (WO, part, revision, customer, quantity) in one clear shot, then run AI Vision or OCR.</p>
+        <div className="mini-note" role="note">
+          <strong>Header photo guidance (beta):</strong> Use rear camera, fill frame with the printed header, avoid glare/shadows, and keep text horizontal and in focus.
+        </div>
+        <div className="quick-entry-card">
+          <h3>Beta Validation Checklist</h3>
+          <p>Before you generate a draft, verify these beta checks to reduce extraction errors:</p>
+          <ul className="beta-checklist">
+            <li>Header photo includes Work Order, Part Number, Revision, Customer, and Quantity.</li>
+            <li>Operation/Process line is visible in the same image or a second support image.</li>
+            <li>Extracted fields match printed values before confirmation checkboxes are completed.</li>
+          </ul>
+        </div>
         <input
           ref={takePhotoInputRef}
           className="capture-input-hidden"

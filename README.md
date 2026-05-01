@@ -93,3 +93,23 @@ Expected JSON body:
 ```
 
 The route appends the report below the email draft and sends the message using Resend from the server side.
+
+
+## Header photo guidance (beta)
+
+For best extraction quality during beta:
+
+- Use the rear camera when possible.
+- Fill the frame with the printed work order header.
+- Keep text level, in focus, and free of glare/shadows.
+- Ensure this header block is visible: Work Order, Part Number, Revision, Customer, Quantity.
+- Capture the operation/process line in the same photo or a second support image.
+
+## Beta validation checklist
+
+Before generating the Engineering draft, validate:
+
+- Header fields extracted by AI Vision/OCR match the printed work order.
+- Operation/process values are confirmed against the document.
+- Issue summary and requested correction are complete and specific.
+- Confirmation checkboxes are completed before send remains enabled.
