@@ -80,19 +80,22 @@ const confirmationLabels = [
   'I confirm the email draft is ready to send.',
 ];
 
-const workflow = [
-  ['📷', 'Capture Router', 'Snap or upload work order.'],
-  ['📋', 'Extract + Confirm', 'Pull WO, part, process, and rate into clean fields.'],
-  ['🗂', 'Build Correction', 'Generate report and Engineering email draft.'],
-  ['➤', 'Confirm + Send', 'Draft first. Confirm accuracy. Then send.'],
+type TaskView = 'Home' | 'Capture' | 'Build Correction' | 'Drafts' | 'History' | 'More';
+
+const workflow: [string, string, string, TaskView][] = [
+  ['📷', 'Capture Router', 'Snap or upload work order.', 'Capture'],
+  ['📋', 'Extract + Confirm', 'Pull WO, part, process, and rate into clean fields.', 'Capture'],
+  ['🗂', 'Build Correction', 'Generate report and Engineering email draft.', 'Build Correction'],
+  ['➤', 'Confirm + Send', 'Draft first. Confirm accuracy. Then send.', 'Drafts'],
 ];
 
-const navItems = [
-  ['⌂', 'Home', '#home'],
-  ['📷', 'Capture', '#capture'],
-  ['🗂', 'Drafts', '#drafts'],
-  ['◷', 'History', '#history'],
-  ['⚙', 'More', '#more'],
+const navItems: [string, TaskView][] = [
+  ['⌂', 'Home'],
+  ['📷', 'Capture'],
+  ['🧩', 'Build Correction'],
+  ['🗂', 'Drafts'],
+  ['◷', 'History'],
+  ['⚙', 'More'],
 ];
 
 const correctionTypeOptions = [
@@ -337,6 +340,7 @@ export default function Home() {
   const [sending, setSending] = useState(false);
   const [history, setHistory] = useState<SubmissionRecord[]>([]);
   const [nextWocId, setNextWocId] = useState(1);
+  const [activeView, setActiveView] = useState<TaskView>('Home');
 
   const setField = (field: keyof WocData, value: string) => {
     setData((current) => ({ ...current, [field]: value }));
@@ -366,6 +370,20 @@ export default function Home() {
     setShowDraft(false);
     setChecks(Array(5).fill(false));
     setStatus('Sample welding time issue loaded.');
+  };
+
+  const clearForm = () => {
+    setData(blank);
+    setImageUrl('');
+    setSelectedFileName('');
+    setSelectedImageFile(null);
+    setRouterText('');
+    setShowDraft(false);
+    setChecks(Array(5).fill(false));
+    setStatus('');
+    setVisionDebugMessage('');
+    setLastVisionResult(null);
+    setActiveView('Capture');
   };
 
   const extractData = () => {
@@ -780,6 +798,7 @@ ${emailBody}`;
       setHistory((current) => [record, ...current].slice(0, 8));
       setNextWocId((current) => current + 1);
       setStatus('Email sent successfully.');
+      setActiveView('Drafts');
     }
 
     setSending(false);
@@ -798,6 +817,8 @@ ${emailBody}`;
         <div className="system-pill"><span />AI-WOC SYSTEM</div>
       </section>
 
+      {activeView === 'Home' ? (
+      <>
       <section className="hero-card glow-card">
         <div className="hero-copy">
           <p className="eyebrow">Standardize to Optimize</p>
@@ -822,18 +843,22 @@ ${emailBody}`;
           <span />
           <h2>Correction Workflow</h2>
         </div>
-        {workflow.map(([step, title, subtitle]) => (
-          <div className="workflow-row" key={title}>
+        {workflow.map(([step, title, subtitle, targetView]) => (
+          <button type="button" className="workflow-row" key={title} onClick={() => setActiveView(targetView)}>
             <div className="step-box glass-icon-tile">{step}</div>
             <div>
               <h3>{title}</h3>
               <p>{subtitle}</p>
             </div>
             <b>›</b>
-          </div>
+          </button>
         ))}
       </section>
 
+      </>
+      ) : null}
+
+      {activeView === 'Capture' ? (
       <section className="panel glow-card capture-panel" id="capture">
         <div className="panel-heading">
           <p>Step 1</p>
@@ -988,7 +1013,10 @@ ${emailBody}`;
           <button type="button" onClick={loadSample}>Load Sample</button>
         </div>
       </section>
+      ) : null}
 
+      {activeView === 'Build Correction' ? (
+      <>
       <section className="panel glow-card" id="data">
         <div className="panel-heading">
           <p>Step 2</p>
@@ -1073,7 +1101,10 @@ ${emailBody}`;
         </label>
         <button type="button" onClick={generateDraft}>Generate Report + Email Draft</button>
       </section>
+      </>
+      ) : null}
 
+      {activeView === 'Drafts' ? (
       <section className="panel glow-card draft-panel" id="drafts">
         <div className="panel-heading">
           <p>Step 4</p>
@@ -1107,16 +1138,21 @@ ${emailBody}`;
               <button type="button" className="secondary" onClick={() => copyText(emailDraft)}>Copy Email</button>
             </div>
             <button type="button" disabled={!readyToDraft || !allConfirmed || sending} onClick={sendEmail}>{sending ? 'Sending...' : 'Send Email'}</button>
+            <div className="button-row">
+              <button type="button" className="secondary" onClick={clearForm}>Start New Correction / Clear Form</button>
+            </div>
           </>
         ) : (
           <div className="empty-state">
             <strong>No active draft yet.</strong>
             <p>Complete the issue fields and generate the correction report to review the email draft here.</p>
-            <a href="#issue">Build Correction</a>
+            <button type="button" className="secondary" onClick={() => setActiveView('Build Correction')}>Build Correction</button>
           </div>
         )}
       </section>
+      ) : null}
 
+      {activeView === 'History' ? (
       <section className="panel glow-card compact-info" id="history">
         <div className="panel-heading">
           <p>History</p>
@@ -1134,7 +1170,9 @@ ${emailBody}`;
           <p>Sent requests will appear here after email delivery is connected and tracking is added.</p>
         )}
       </section>
+      ) : null}
 
+      {activeView === 'More' ? (
       <section className="panel glow-card compact-info" id="more">
         <div className="panel-heading">
           <p>System</p>
@@ -1143,13 +1181,14 @@ ${emailBody}`;
         <p>Work Order Correction powered by Applied Intelligence Framework. Draft first. Confirm accuracy. Then send.</p>
         <p className="mini-note">Default Engineering recipient: {DEFAULT_TO_EMAIL}</p>
       </section>
+      ) : null}
 
       <nav className="bottom-nav" aria-label="AI-WOC navigation">
-        {navItems.map(([icon, item, target], index) => (
-          <a className={index === 0 ? 'active' : ''} href={target} key={item}>
-            <span className={`nav-icon glass-icon-tile ${index === 0 ? 'active' : ''}`}>{icon}</span>
+        {navItems.map(([icon, item]) => (
+          <button type="button" className={activeView === item ? 'active' : ''} onClick={() => setActiveView(item)} key={item}>
+            <span className={`nav-icon glass-icon-tile ${activeView === item ? 'active' : ''}`}>{icon}</span>
             <span>{item}</span>
-          </a>
+          </button>
         ))}
       </nav>
 
