@@ -506,6 +506,19 @@ button:disabled { opacity: 0.45; }
   font-size: 13px;
 }
 
+
+.beta-checklist {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.beta-checklist li + li {
+  margin-top: 6px;
+}
+
 .quick-entry-grid {
   display: grid;
   grid-template-columns: 1fr;
