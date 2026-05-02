@@ -82,13 +82,6 @@ const confirmationLabels = [
 
 type TaskView = 'Home' | 'Capture' | 'Build Correction' | 'Drafts' | 'History' | 'More';
 
-const workflow: [string, string, string, TaskView][] = [
-  ['📷', 'Capture Router', 'Snap or upload work order.', 'Capture'],
-  ['📋', 'Extract + Confirm', 'Pull WO, part, process, and rate into clean fields.', 'Capture'],
-  ['🗂', 'Build Correction', 'Generate report and Engineering email draft.', 'Build Correction'],
-  ['➤', 'Confirm + Send', 'Draft first. Confirm accuracy. Then send.', 'Drafts'],
-];
-
 const navItems: [string, TaskView][] = [
   ['⌂', 'Home'],
   ['📷', 'Capture'],
@@ -806,53 +799,29 @@ ${emailBody}`;
 
   return (
     <main className="shell" id="home">
-      <section className="top-card glow-card">
-        <div className="brand-tile" aria-label="REFAB Connect icon">
-          <img src="/apple-touch-icon.png" alt="REFAB Connect" />
-        </div>
-        <div className="top-copy">
-          <h1>Work Order<br />Correction</h1>
-          <span>Powered by Applied Intelligence Framework</span>
-        </div>
-        <div className="system-pill"><span />AI-WOC SYSTEM</div>
-      </section>
-
       {activeView === 'Home' ? (
       <>
-      <section className="hero-card glow-card">
-        <div className="hero-copy">
-          <p className="eyebrow">Standardize to Optimize</p>
-          <h2>Fix bad router data before it becomes waste.</h2>
-          <p>Snap the work order, confirm the WO, part, process, and issue, then generate a controlled Engineering correction request.</p>
+      <section className="home-minimal glow-card">
+        <div className="system-pill"><span />SYSTEM ACTIVE</div>
+        <div className="home-minimal-brand" aria-label="REFAB Connect icon">
+          <img src="/apple-touch-icon.png" alt="REFAB Connect" />
         </div>
-        <div className="hero-emblem" aria-hidden="true">
-          <div className="shield">✓</div>
-          <div className="rings" />
+        <div className="home-minimal-copy">
+          <h1>AI-WOC System Active</h1>
+          <p>Clear. Guided. Fast.</p>
         </div>
-      </section>
-
-      <section className="stats-grid" aria-label="AI-WOC stats">
-        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile">🗂</div><div><span>Draft Requests</span><strong>{showDraft ? '1' : '0'}</strong><small>Current session</small></div></article>
-        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile active">➤</div><div><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>Confirmed gate</small></div></article>
-        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile">◷</div><div><span>Sent Today</span><strong>{history.length}</strong><small>Session count</small></div></article>
-        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile">ID</div><div><span>Mode</span><strong>WOC</strong><small>Correction flow</small></div></article>
-      </section>
-
-      <section className="workflow-card compact-card glow-card">
-        <div className="section-title">
-          <span />
+        <section className="workflow-minimal" aria-label="Correction workflow steps">
           <h2>Correction Workflow</h2>
+          <ul>
+            <li>Capture Router</li>
+            <li>Extract + Confirm</li>
+            <li>Build Correction</li>
+            <li>Confirm + Send</li>
+          </ul>
+        </section>
+        <div className="home-minimal-cta">
+          <button type="button" onClick={() => setActiveView('Capture')}>Start Capture</button>
         </div>
-        {workflow.map(([step, title, subtitle, targetView]) => (
-          <button type="button" className="workflow-row" key={title} onClick={() => setActiveView(targetView)}>
-            <div className="step-box glass-icon-tile">{step}</div>
-            <div>
-              <h3>{title}</h3>
-              <p>{subtitle}</p>
-            </div>
-            <b>›</b>
-          </button>
-        ))}
       </section>
 
       </>
