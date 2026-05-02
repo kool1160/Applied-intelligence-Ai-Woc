@@ -542,6 +542,24 @@ button:disabled { opacity: 0.45; }
   min-height: 86px;
 }
 
+.capture-intro {
+  margin-bottom: 10px;
+}
+
+.capture-guidance {
+  margin-top: 8px;
+}
+
+.capture-section {
+  margin-top: 14px;
+}
+
+.capture-section h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+}
+
 .quick-entry-full {
   grid-column: 1 / -1;
 }
