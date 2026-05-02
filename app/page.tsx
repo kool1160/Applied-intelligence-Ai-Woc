@@ -859,13 +859,9 @@ ${emailBody}`;
           <p>Step 1</p>
           <h2>Capture Work Order</h2>
         </div>
-        <p className="mini-note">Photo is saved as evidence. To auto-fill fields, capture the full printed header (WO, part, revision, customer, quantity) in one clear shot, then run AI Vision or OCR.</p>
-        <div className="mini-note" role="note">
-          <strong>Header photo guidance (beta):</strong> Use rear camera, fill frame with the printed header, avoid glare/shadows, and keep text horizontal and in focus.
-        </div>
-        <div className="quick-entry-card">
-          <h3>Beta Validation Checklist</h3>
-          <p>Before you generate a draft, verify these beta checks to reduce extraction errors:</p>
+        <p className="mini-note capture-intro">Follow this flow: 1) Take Photo or Upload, 2) Preview, 3) Extract with AI Vision or OCR, 4) Quick Entry, 5) OCR text fallback.</p>
+        <div className="quick-entry-card capture-guidance" role="note">
+          <h3>Header Photo Guidance</h3>
           <ul className="beta-checklist">
             <li>Header photo includes Work Order, Part Number, Revision, Customer, and Quantity.</li>
             <li>Operation/Process line is visible in the same image or a second support image.</li>
@@ -891,22 +887,31 @@ ${emailBody}`;
             onWorkOrderFileSelected(event.target.files?.[0]);
           }}
         />
-        <button type="button" className="capture-trigger" onClick={() => takePhotoInputRef.current?.click()}>
+        <div className="capture-section">
+          <h3>1. Take Photo / Upload</h3>
+          <button type="button" className="capture-trigger" onClick={() => takePhotoInputRef.current?.click()}>
           <span className="glass-icon-tile active">📷</span>
           <span>
             <strong>Take Photo</strong>
             <small>Use rear camera to capture work order.</small>
           </span>
-        </button>
-        <button type="button" className="capture-trigger" onClick={() => uploadInputRef.current?.click()}>
+          </button>
+          <button type="button" className="capture-trigger" onClick={() => uploadInputRef.current?.click()}>
           <span className="glass-icon-tile">📁</span>
           <span>
             <strong>Upload File / Picture</strong>
             <small>Select image or PDF from Photo Library or Files.</small>
           </span>
-        </button>
-        {imageUrl ? <img className="preview" src={imageUrl} alt="Uploaded work order preview" /> : null}
-        <div className="button-row">
+          </button>
+        </div>
+        <div className="capture-section">
+          <h3>2. Preview</h3>
+          {imageUrl ? <img className="preview" src={imageUrl} alt="Uploaded work order preview" /> : <p className="mini-note">No image preview yet.</p>}
+          {!imageUrl && selectedFileName ? <p className="mini-note">Selected file: {selectedFileName}</p> : null}
+        </div>
+        <div className="capture-section">
+          <h3>3. Extract</h3>
+          <div className="button-row">
           <button
             type="button"
             className="secondary"
@@ -923,7 +928,7 @@ ${emailBody}`;
           >
             {ocrLoading ? 'Extracting Text…' : 'Basic OCR Fallback'}
           </button>
-        </div>
+          </div>
         {visionDebugMessage ? (
           <div className="vision-status-card" role="status" aria-live="polite">
             <p>{visionDebugMessage}</p>
@@ -939,10 +944,10 @@ ${emailBody}`;
             ) : null}
           </div>
         ) : null}
-        {!imageUrl && selectedFileName ? <p className="mini-note">Selected file: {selectedFileName}</p> : null}
-        <div className="quick-entry-card">
-          <h3>Quick Entry</h3>
-          <p>Enter the printed header and issue details while viewing the work order image.</p>
+        </div>
+        <div className="quick-entry-card capture-section">
+          <h3>4. Quick Entry</h3>
+          <p>Fill or correct extracted fields.</p>
           <div className="quick-entry-grid">
             <label>
               Work Order Number
@@ -993,6 +998,8 @@ ${emailBody}`;
             </label>
           </div>
         </div>
+        <div className="capture-section">
+        <h3>5. OCR Text Fallback</h3>
         <label>
           Paste Router / OCR Text
           <textarea
@@ -1006,6 +1013,7 @@ ${emailBody}`;
             Extract From Text
           </button>
           <button type="button" onClick={loadSample}>Load Sample</button>
+        </div>
         </div>
         <div className="button-row">
           <button type="button" onClick={() => setActiveView('Build Correction')}>Continue to Build Correction</button>
