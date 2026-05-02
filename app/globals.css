@@ -748,3 +748,49 @@ pre {
   .bottom-nav button { font-size: 11px; }
   .nav-icon { font-size: 19px; }
 }
+
+.home-system-hero {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+  gap: 22px;
+  min-height: unset;
+  padding: 34px 24px;
+  margin-top: 22px;
+}
+
+.home-system-icon {
+  width: clamp(104px, 32vw, 156px);
+  height: auto;
+  border-radius: 24px;
+  border: 1px solid rgba(212, 219, 226, 0.42);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.34);
+}
+
+.home-system-copy h2 {
+  margin: 0;
+  font-size: clamp(34px, 8.8vw, 52px);
+}
+
+.home-system-copy p {
+  margin-top: 12px;
+  font-size: clamp(19px, 4.8vw, 24px);
+  letter-spacing: 0.04em;
+}
+
+.home-workflow {
+  margin-top: 18px;
+  padding-top: 20px;
+}
+
+.section-title.centered {
+  justify-content: center;
+}
+
+.home-workflow-row {
+  align-items: center;
+}
+
+.home-workflow-row h3 {
+  margin: 0;
+}

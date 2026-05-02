@@ -819,36 +819,24 @@ ${emailBody}`;
 
       {activeView === 'Home' ? (
       <>
-      <section className="hero-card glow-card">
-        <div className="hero-copy">
-          <p className="eyebrow">Standardize to Optimize</p>
-          <h2>Fix bad router data before it becomes waste.</h2>
-          <p>Snap the work order, confirm the WO, part, process, and issue, then generate a controlled Engineering correction request.</p>
-        </div>
-        <div className="hero-emblem" aria-hidden="true">
-          <div className="shield">✓</div>
-          <div className="rings" />
+      <section className="hero-card glow-card home-system-hero">
+        <img className="home-system-icon" src="/refab-connect-master-1024.png" alt="Refab Connect AI-WOC" />
+        <div className="hero-copy home-system-copy">
+          <h2>AI-WOC System Active</h2>
+          <p>Clear. Guided. Fast.</p>
         </div>
       </section>
 
-      <section className="stats-grid" aria-label="AI-WOC stats">
-        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile">🗂</div><div><span>Draft Requests</span><strong>{showDraft ? '1' : '0'}</strong><small>Current session</small></div></article>
-        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile active">➤</div><div><span>Ready to Send</span><strong>{allConfirmed ? '1' : '0'}</strong><small>Confirmed gate</small></div></article>
-        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile">◷</div><div><span>Sent Today</span><strong>{history.length}</strong><small>Session count</small></div></article>
-        <article className="stat-card glow-card"><div className="stat-icon glass-icon-tile">ID</div><div><span>Mode</span><strong>WOC</strong><small>Correction flow</small></div></article>
-      </section>
-
-      <section className="workflow-card compact-card glow-card">
-        <div className="section-title">
+      <section className="workflow-card compact-card glow-card home-workflow" aria-label="AI-WOC workflow steps">
+        <div className="section-title centered">
           <span />
-          <h2>Correction Workflow</h2>
+          <h2>Workflow</h2>
         </div>
-        {workflow.map(([step, title, subtitle, targetView]) => (
-          <button type="button" className="workflow-row" key={title} onClick={() => setActiveView(targetView)}>
-            <div className="step-box glass-icon-tile">{step}</div>
+        {workflow.map(([step, title, _subtitle, targetView], index) => (
+          <button type="button" className="workflow-row home-workflow-row" key={title} onClick={() => setActiveView(targetView)}>
+            <div className="step-box glass-icon-tile">{index + 1}</div>
             <div>
               <h3>{title}</h3>
-              <p>{subtitle}</p>
             </div>
             <b>›</b>
           </button>
