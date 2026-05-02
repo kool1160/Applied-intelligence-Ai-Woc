@@ -753,10 +753,24 @@ pre {
   grid-template-columns: 1fr;
   justify-items: center;
   text-align: center;
-  gap: 22px;
+  gap: 18px;
   min-height: unset;
-  padding: 34px 24px;
+  padding: 28px 24px;
   margin-top: 22px;
+}
+
+.home-active-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(164, 239, 212, 0.55);
+  background: rgba(68, 197, 145, 0.15);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: #d9f9ec;
 }
 
 .home-system-icon {
@@ -789,8 +803,14 @@ pre {
 
 .home-workflow-row {
   align-items: center;
+  pointer-events: none;
 }
 
 .home-workflow-row h3 {
   margin: 0;
+}
+
+.home-start-button {
+  width: min(360px, 100%);
+  margin-top: 4px;
 }

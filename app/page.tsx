@@ -820,11 +820,19 @@ ${emailBody}`;
       {activeView === 'Home' ? (
       <>
       <section className="hero-card glow-card home-system-hero">
+        <div className="home-active-badge">SYSTEM ACTIVE</div>
         <img className="home-system-icon" src="/refab-connect-master-1024.png" alt="Refab Connect AI-WOC" />
         <div className="hero-copy home-system-copy">
           <h2>AI-WOC System Active</h2>
           <p>Clear. Guided. Fast.</p>
         </div>
+        <button type="button" className="capture-trigger home-start-button" onClick={() => setActiveView('Capture')}>
+          <span className="glass-icon-tile active">📷</span>
+          <span>
+            <strong>Start Capture</strong>
+            <small>Begin work order intake.</small>
+          </span>
+        </button>
       </section>
 
       <section className="workflow-card compact-card glow-card home-workflow" aria-label="AI-WOC workflow steps">
@@ -832,14 +840,13 @@ ${emailBody}`;
           <span />
           <h2>Workflow</h2>
         </div>
-        {workflow.map(([step, title, _subtitle, targetView], index) => (
-          <button type="button" className="workflow-row home-workflow-row" key={title} onClick={() => setActiveView(targetView)}>
+        {workflow.map(([_step, title], index) => (
+          <div className="workflow-row home-workflow-row" key={title}>
             <div className="step-box glass-icon-tile">{index + 1}</div>
             <div>
               <h3>{title}</h3>
             </div>
-            <b>›</b>
-          </button>
+          </div>
         ))}
       </section>
 
