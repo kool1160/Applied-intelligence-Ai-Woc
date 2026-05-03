@@ -820,7 +820,7 @@ ${emailBody}`;
       ) : null}
 
       {activeView === 'Home' ? (
-      <>
+      <div className="home-layout-column">
       <section className="hero-card glow-card home-system-hero">
         <div className="home-active-badge">SYSTEM ACTIVE</div>
         <img className="home-system-icon" src="/refab-connect-master-1024.png" alt="Refab Connect AI-WOC" />
@@ -851,7 +851,7 @@ ${emailBody}`;
         ))}
       </section>
 
-      </>
+      </div>
       ) : null}
 
       {activeView === 'Capture' ? (
