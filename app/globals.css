@@ -907,3 +907,28 @@ pre {
   letter-spacing: 0.01em;
   color: #f7fbff;
 }
+
+.home-layout-column {
+  display: grid;
+  gap: 0;
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+  #home:has(.home-layout-column) {
+    display: grid;
+    justify-items: center;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  #home .home-layout-column {
+    width: min(100%, 700px);
+  }
+
+  #home .home-system-hero,
+  #home .home-workflow {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}

@@ -3,6 +3,7 @@ import './globals.css';
 import './woc.css';
 import './responsive-polish.css';
 import './status-toast.css';
+import './ipad-home-layout.css';
 
 export const metadata: Metadata = {
   title: 'REFAB Connect',
