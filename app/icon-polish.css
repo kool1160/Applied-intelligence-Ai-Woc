@@ -1,5 +1,7 @@
-/* Refab Connect / AI-WOC visual + icon polish
-   Scope: styling only. No workflow, extraction, report, email, or gate logic changes. */
+/* Refab Connect / AI-WOC visual polish
+   Scope: styling only. No workflow, extraction, report, email, or gate logic changes.
+   NOTE: This file intentionally does not force one shared Refab icon into every nav/workflow slot.
+   Approved individual icon assets should be wired as real files or explicit per-icon mappings. */
 
 :root {
   --rc-main-icon: url('/refab-connect-master-1024.png');
@@ -163,13 +165,8 @@ textarea:focus {
 .workflow-row .step-box,
 .capture-trigger .glass-icon-tile,
 .bottom-nav .nav-icon {
-  color: transparent;
-  text-shadow: none;
-}
-
-.workflow-row .step-box,
-.capture-trigger .glass-icon-tile {
-  background-image: var(--rc-main-icon);
+  color: var(--soft-blue);
+  text-shadow: 0 0 8px rgba(246, 248, 250, 0.28);
 }
 
 .bottom-nav {
@@ -198,7 +195,7 @@ textarea:focus {
   min-width: 32px;
   border-radius: 11px;
   border-color: rgba(154, 165, 181, 0.3);
-  background-image: var(--rc-app-icon);
+  background-image: none;
   background-size: 82%;
   background-position: center;
   background-repeat: no-repeat;
