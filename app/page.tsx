@@ -811,10 +811,10 @@ ${emailBody}`;
           <img src="/apple-touch-icon.png" alt="REFAB Connect" />
         </div>
         <div className="top-copy">
-          <h1>Work Order<br />Correction</h1>
-          <span>Powered by Applied Intelligence Framework</span>
+          <h1>Refab Connect</h1>
+          <span>AI-WOC</span>
         </div>
-        <div className="system-pill"><span />AI-WOC SYSTEM</div>
+        <div className="system-pill"><span />SYSTEM ACTIVE</div>
       </section>
 
       {activeView === 'Home' ? (
@@ -823,14 +823,13 @@ ${emailBody}`;
         <div className="home-active-badge">SYSTEM ACTIVE</div>
         <img className="home-system-icon" src="/refab-connect-master-1024.png" alt="Refab Connect AI-WOC" />
         <div className="hero-copy home-system-copy">
-          <h2>AI-WOC System Active</h2>
+          <h2>Correction<br />System Active</h2>
           <p>Clear. Guided. Fast.</p>
         </div>
         <button type="button" className="capture-trigger home-start-button" onClick={() => setActiveView('Capture')}>
           <span className="glass-icon-tile active">📷</span>
           <span>
             <strong>Start Capture</strong>
-            <small>Begin work order intake.</small>
           </span>
         </button>
       </section>
