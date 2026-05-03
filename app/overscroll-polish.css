@@ -1,0 +1,79 @@
+/* iOS / mobile overscroll polish
+   Scope: page chrome/background only. No workflow, routing, or app logic changes. */
+
+html,
+body {
+  min-height: 100%;
+  background-color: #07090d;
+  overscroll-behavior-y: none;
+}
+
+html {
+  background:
+    radial-gradient(circle at 50% -18%, rgba(75, 141, 255, 0.16), transparent 34%),
+    radial-gradient(circle at 92% 0%, rgba(239, 78, 84, 0.12), transparent 28%),
+    linear-gradient(180deg, #0d1017 0%, #080a0f 44%, #050608 100%);
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% -18%, rgba(75, 141, 255, 0.16), transparent 34%),
+    radial-gradient(circle at 92% 0%, rgba(239, 78, 84, 0.12), transparent 28%),
+    radial-gradient(circle at 12% 18%, rgba(120, 187, 255, 0.08), transparent 30%),
+    linear-gradient(180deg, #0d1017 0%, #080a0f 44%, #050608 100%);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: -180px 0 auto 0;
+  height: calc(260px + env(safe-area-inset-top));
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(75, 141, 255, 0.18), transparent 42%),
+    radial-gradient(circle at 92% 10%, rgba(239, 78, 84, 0.12), transparent 34%),
+    linear-gradient(180deg, #0d1017 0%, #090b11 58%, rgba(9, 11, 17, 0) 100%);
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(168px + env(safe-area-inset-top));
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(9, 11, 17, 0.96), rgba(9, 11, 17, 0.72) 58%, rgba(9, 11, 17, 0));
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+}
+
+.shell::before {
+  content: '';
+  position: absolute;
+  left: -18px;
+  right: -18px;
+  top: calc(-170px - env(safe-area-inset-top));
+  height: calc(210px + env(safe-area-inset-top));
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(75, 141, 255, 0.14), transparent 44%),
+    radial-gradient(circle at 88% 4%, rgba(239, 78, 84, 0.1), transparent 34%),
+    linear-gradient(180deg, #0d1017 0%, #080a0f 72%, rgba(8, 10, 15, 0) 100%);
+}
+
+@supports (-webkit-touch-callout: none) {
+  html,
+  body {
+    background-attachment: fixed;
+  }
+}
