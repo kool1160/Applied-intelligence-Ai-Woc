@@ -67,3 +67,31 @@
 .capture-panel textarea {
   min-height: 145px;
 }
+
+.build-correction-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.build-section {
+  margin: 0;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(206, 213, 221, 0.24);
+  background: linear-gradient(145deg, rgba(31, 35, 42, 0.75), rgba(12, 14, 18, 0.85));
+}
+
+.build-section h3 {
+  margin: 0 0 8px;
+  color: var(--soft-blue);
+  font-size: 16px;
+  letter-spacing: 0.01em;
+}
+
+.build-section label:first-of-type {
+  margin-top: 8px;
+}
+
+.build-section-cta button {
+  margin-top: 8px;
+}
