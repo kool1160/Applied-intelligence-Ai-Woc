@@ -7,6 +7,7 @@ import './ipad-home-layout.css';
 import './icon-polish.css';
 import './nav-stability.css';
 import './overscroll-polish.css';
+import './locked-color-theme.css';
 
 export const metadata: Metadata = {
   title: 'REFAB Connect',
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0b0c0f',
+  themeColor: '#03070c',
   viewportFit: 'cover',
 };
 
