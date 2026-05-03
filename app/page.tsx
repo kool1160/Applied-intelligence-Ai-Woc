@@ -806,6 +806,7 @@ ${emailBody}`;
 
   return (
     <main className="shell" id="home">
+      {activeView !== 'Home' ? (
       <section className="top-card glow-card">
         <div className="brand-tile" aria-label="REFAB Connect icon">
           <img src="/apple-touch-icon.png" alt="REFAB Connect" />
@@ -816,6 +817,7 @@ ${emailBody}`;
         </div>
         <div className="system-pill"><span />SYSTEM ACTIVE</div>
       </section>
+      ) : null}
 
       {activeView === 'Home' ? (
       <>
