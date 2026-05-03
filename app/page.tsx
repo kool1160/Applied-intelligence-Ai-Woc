@@ -1191,33 +1191,46 @@ ${emailBody}`;
       ) : null}
 
       {activeView === 'History' ? (
-      <section className="panel glow-card compact-info" id="history">
+      <section className="panel glow-card compact-info history-panel" id="history">
         <div className="panel-heading">
           <p>History</p>
           <h2>Submission History</h2>
         </div>
+        <p className="history-intro">Recent Engineering submissions are listed below with the same send-time details captured at draft confirmation.</p>
         {history.length ? (
           <ul className="history-list">
             {history.map((item) => (
               <li key={item.wocId}>
-                <strong>{item.wocId}</strong> — {item.dateSubmitted} — WO {item.workOrderNumber || 'TBD'} / {item.partNumber || 'TBD'} — {item.category} — {item.status}
+                <strong>{item.wocId}</strong>
+                <span>{item.dateSubmitted}</span>
+                <span>WO {item.workOrderNumber || 'TBD'} / {item.partNumber || 'TBD'}</span>
+                <span>{item.category} • {item.status}</span>
               </li>
             ))}
           </ul>
         ) : (
-          <p>Sent requests will appear here after email delivery is connected and tracking is added.</p>
+          <div className="empty-state history-empty-state">
+            <strong>No submissions yet.</strong>
+            <p>Sent requests will appear here after email delivery is connected and tracking is added.</p>
+          </div>
         )}
       </section>
       ) : null}
 
       {activeView === 'More' ? (
-      <section className="panel glow-card compact-info" id="more">
+      <section className="panel glow-card compact-info more-panel" id="more">
         <div className="panel-heading">
           <p>System</p>
           <h2>REFAB Connect</h2>
         </div>
-        <p>Work Order Correction powered by Applied Intelligence Framework. Draft first. Confirm accuracy. Then send.</p>
-        <p className="mini-note">Default Engineering recipient: {DEFAULT_TO_EMAIL}</p>
+        <section className="more-group">
+          <h3 className="more-group-title">AI-WOC Scope</h3>
+          <p>Work Order Correction powered by Applied Intelligence Framework. Draft first. Confirm accuracy. Then send.</p>
+        </section>
+        <section className="more-group">
+          <h3 className="more-group-title">Default Recipient</h3>
+          <p className="mini-note">Default Engineering recipient: {DEFAULT_TO_EMAIL}</p>
+        </section>
       </section>
       ) : null}
 
