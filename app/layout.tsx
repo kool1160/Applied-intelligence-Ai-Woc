@@ -8,6 +8,7 @@ import './icon-polish.css';
 import './nav-stability.css';
 import './overscroll-polish.css';
 import './locked-color-theme.css';
+import './horizontal-lock.css';
 
 export const metadata: Metadata = {
   title: 'REFAB Connect',
