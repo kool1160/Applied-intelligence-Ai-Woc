@@ -16,8 +16,8 @@
   --muted: #aab3c2;
   --quiet: #707a88;
   --dark-text: #03070c;
-  --rc-main-icon: url('/refab-connect-icons/app/refab-connect-main-red-lock.svg');
-  --rc-app-icon: url('/refab-connect-icons/app/refab-connect-main-red-lock.svg');
+  --rc-main-icon: url('/refab-connect-icons/app/refab-connect-black-neon-ios-180.png');
+  --rc-app-icon: url('/refab-connect-icons/app/refab-connect-black-neon-ios-180.png');
 }
 
 html,
