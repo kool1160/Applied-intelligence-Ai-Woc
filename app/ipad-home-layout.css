@@ -1,0 +1,48 @@
+@media (min-width: 768px) and (max-width: 1400px) {
+  body:has(#home .home-layout-column) .shell {
+    width: 100%;
+    max-width: none;
+    min-height: 100dvh;
+    margin: 0;
+    padding: clamp(18px, 3vh, 36px) 24px 188px;
+    display: grid;
+    justify-items: center;
+    align-content: center;
+  }
+
+  #home:has(.home-layout-column) {
+    width: 100%;
+    max-width: none;
+    min-height: calc(100dvh - 224px);
+    padding: 0;
+    display: grid;
+    justify-items: center;
+    align-content: center;
+  }
+
+  #home .home-layout-column {
+    width: min(100%, 560px);
+    margin-inline: auto;
+    display: grid;
+    gap: 18px;
+  }
+
+  #home .home-system-hero,
+  #home .home-workflow {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  #home .home-system-hero {
+    margin-top: 0;
+  }
+
+  .bottom-nav {
+    max-width: 640px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(calc(100vw - 48px), 640px);
+  }
+}
