@@ -21,10 +21,10 @@
   }
 
   #home .home-layout-column {
-    width: min(100%, 560px);
+    width: min(100%, 540px);
     margin-inline: auto;
     display: grid;
-    gap: 18px;
+    gap: 12px;
   }
 
   #home .home-system-hero,
@@ -36,6 +36,56 @@
 
   #home .home-system-hero {
     margin-top: 0;
+    padding: 26px 24px 20px;
+  }
+
+  #home .home-system-icon {
+    width: clamp(150px, 27vw, 198px);
+  }
+
+  #home .home-system-copy h2 {
+    font-size: clamp(32px, 4.5vw, 42px);
+  }
+
+  #home .home-system-copy p {
+    margin-top: 10px;
+    font-size: clamp(16px, 2.1vw, 20px);
+    letter-spacing: 0.03em;
+  }
+
+  #home .home-start-button {
+    width: min(390px, 100%);
+    min-height: 72px;
+    margin-top: 0;
+  }
+
+  #home .home-start-button .glass-icon-tile {
+    width: 50px;
+    height: 50px;
+  }
+
+  #home .home-workflow {
+    margin-top: 4px;
+    padding: 12px 14px 8px;
+  }
+
+  #home .home-workflow-row {
+    padding: 8px 10px;
+  }
+
+  #home .home-workflow-row .step-box {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    font-size: 22px;
+  }
+
+  #home .home-workflow-row h3 {
+    font-size: 17px;
+  }
+
+  #home .home-workflow-row p {
+    font-size: 13px;
   }
 
   .bottom-nav {
