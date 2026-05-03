@@ -95,3 +95,47 @@
 .build-section-cta button {
   margin-top: 8px;
 }
+
+.draft-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.draft-group {
+  margin: 0;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(206, 213, 221, 0.24);
+  background: linear-gradient(145deg, rgba(31, 35, 42, 0.75), rgba(12, 14, 18, 0.85));
+}
+
+.draft-group-title {
+  margin: 0 0 10px;
+  color: var(--soft-blue);
+  font-size: 16px;
+  letter-spacing: 0.01em;
+}
+
+.checks-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.gate ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+@media (max-width: 620px) {
+  .draft-group {
+    padding: 12px;
+  }
+
+  .draft-group-title {
+    font-size: 15px;
+  }
+
+  .button-row {
+    grid-template-columns: 1fr;
+  }
+}
