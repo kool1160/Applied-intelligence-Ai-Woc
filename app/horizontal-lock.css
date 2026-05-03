@@ -1,0 +1,117 @@
+/* Horizontal drift lock
+   Scope: viewport/shell containment only. No workflow, routing, or app logic changes. */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
+body {
+  position: relative;
+}
+
+#__next,
+.shell,
+main.shell {
+  width: 100%;
+  max-width: min(760px, 100vw);
+  margin-left: auto;
+  margin-right: auto;
+  overflow-x: clip;
+  contain: paint;
+}
+
+.shell {
+  padding-left: max(14px, env(safe-area-inset-left));
+  padding-right: max(14px, env(safe-area-inset-right));
+}
+
+.glow-card,
+.top-card,
+.hero-card,
+.workflow-card,
+.panel,
+.home-system-hero,
+.home-workflow,
+.workflow-row,
+.capture-trigger,
+.template-card,
+.gate,
+.build-section,
+.draft-group,
+.quick-entry-card,
+.vision-status-card,
+.status {
+  max-width: 100%;
+}
+
+.home-system-hero,
+.home-workflow,
+.workflow-card,
+.panel {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.home-start-button,
+.capture-trigger,
+.workflow-row,
+button,
+input,
+select,
+textarea,
+pre {
+  max-width: 100%;
+}
+
+/* Prevent wide internal content from forcing the page sideways. */
+pre,
+textarea,
+input,
+select,
+.workflow-row h3,
+.workflow-row p,
+.panel h2,
+.hero-card h2,
+.home-system-copy h2,
+.top-copy h1 {
+  overflow-wrap: anywhere;
+}
+
+/* Fixed chrome should not contribute to horizontal scroll width. */
+.bottom-nav,
+.status {
+  max-width: calc(100vw - 12px);
+}
+
+@media (max-width: 620px) {
+  #__next,
+  .shell,
+  main.shell {
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+
+  .shell {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+
+  .home-system-hero,
+  .home-workflow,
+  .workflow-card,
+  .panel {
+    max-width: calc(100vw - 24px);
+  }
+
+  .home-start-button,
+  .capture-trigger,
+  .workflow-row {
+    width: 100%;
+  }
+}
