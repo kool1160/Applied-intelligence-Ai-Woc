@@ -5,6 +5,7 @@ import './responsive-polish.css';
 import './status-toast.css';
 import './ipad-home-layout.css';
 import './icon-polish.css';
+import './nav-stability.css';
 
 export const metadata: Metadata = {
   title: 'REFAB Connect',
