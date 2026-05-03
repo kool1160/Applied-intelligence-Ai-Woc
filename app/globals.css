@@ -752,31 +752,39 @@ pre {
 
 @media (min-width: 768px) and (max-width: 1100px) {
   #home {
-    max-width: 900px;
-    padding-left: 24px;
-    padding-right: 24px;
+    max-width: 980px;
+    padding-left: 28px;
+    padding-right: 28px;
+    min-height: calc(100dvh - 132px);
+    align-content: start;
   }
 
   #home .top-card,
   #home .home-system-hero,
   #home .home-workflow {
-    width: min(100%, 680px);
+    width: min(100%, 740px);
     margin-left: auto;
     margin-right: auto;
   }
 
   #home .home-system-hero {
-    padding: 28px 30px;
+    min-height: clamp(460px, 60vh, 560px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 34px 34px 30px;
+    margin-top: clamp(12px, 4vh, 36px);
   }
 
   #home .home-workflow {
-    padding: 20px 22px;
+    padding: 22px 24px 14px;
+    margin-top: 18px;
   }
 
   .bottom-nav {
-    max-width: 640px;
-    left: max(24px, calc((100vw - 640px) / 2));
-    right: max(24px, calc((100vw - 640px) / 2));
+    max-width: 700px;
+    left: max(24px, calc((100vw - 700px) / 2));
+    right: max(24px, calc((100vw - 700px) / 2));
   }
 }
 
