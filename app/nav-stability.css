@@ -5,9 +5,9 @@
   position: fixed;
   left: 50%;
   right: auto;
-  bottom: max(10px, calc(env(safe-area-inset-bottom) + 8px));
-  width: min(calc(100vw - 28px), 560px);
-  max-width: 560px;
+  bottom: max(2px, calc(env(safe-area-inset-bottom) - 2px));
+  width: min(calc(100vw - 16px), 720px);
+  max-width: 720px;
   height: 72px;
   min-height: 72px;
   margin: 0;
@@ -16,12 +16,12 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: stretch;
   gap: 6px;
-  border-radius: 24px;
+  border-radius: 28px;
   transform: translateX(-50%);
   overflow: hidden;
   will-change: auto;
   background:
-    linear-gradient(180deg, rgba(28, 34, 45, 0.72), rgba(8, 10, 15, 0.9)),
+    linear-gradient(180deg, rgba(28, 34, 45, 0.74), rgba(8, 10, 15, 0.92)),
     radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.1), transparent 56%);
   border: 1px solid rgba(162, 178, 199, 0.34);
   box-shadow:
@@ -49,7 +49,7 @@
   align-items: center;
   justify-items: center;
   gap: 2px;
-  border-radius: 17px;
+  border-radius: 19px;
   border: 1px solid rgba(130, 145, 166, 0.22);
   background: linear-gradient(180deg, rgba(28, 33, 43, 0.68), rgba(10, 12, 18, 0.76));
   color: #aeb8c8;
@@ -113,19 +113,21 @@
 
 @media (max-width: 620px) {
   .bottom-nav {
-    width: min(calc(100vw - 24px), 520px);
+    bottom: max(1px, calc(env(safe-area-inset-bottom) - 4px));
+    width: min(calc(100vw - 12px), 620px);
+    max-width: 620px;
     height: 66px;
     min-height: 66px;
     padding: 6px;
     gap: 5px;
-    border-radius: 22px;
+    border-radius: 25px;
   }
 
   .bottom-nav button {
     min-height: 0;
     padding: 4px 2px 4px;
     grid-template-rows: 27px 1fr;
-    border-radius: 15px;
+    border-radius: 17px;
     font-size: 9.5px;
   }
 
