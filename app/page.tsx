@@ -1131,35 +1131,54 @@ ${emailBody}`;
         </div>
         {showDraft ? (
           <>
-            <div className={readyToDraft ? 'gate good' : 'gate warn'}>
-              {readyToDraft ? 'Required fields complete. Confirm accuracy before sending.' : 'Some required fields are missing. Fill bracketed required items before confirming.'}
-            </div>
-            {readinessWarnings.length ? (
-              <div className="gate warn">
-                <strong>Warnings (do not block send if required fields are complete):</strong>
-                <ul>
-                  {readinessWarnings.map((warning) => <li key={warning}>{warning}</li>)}
-                </ul>
+            <section className="draft-group">
+              <h3 className="draft-group-title">Readiness + Warnings</h3>
+              <div className={readyToDraft ? 'gate good' : 'gate warn'}>
+                {readyToDraft ? 'Required fields complete. Confirm accuracy before sending.' : 'Some required fields are missing. Fill bracketed required items before confirming.'}
               </div>
-            ) : null}
-            <h3>Correction Report</h3>
-            <pre>{report}</pre>
-            <h3>Email Draft</h3>
-            <pre>{emailDraft}</pre>
-            {confirmationLabels.map((label, index) => (
-              <label className="check" key={label}>
-                <input type="checkbox" checked={checks[index]} onChange={(event) => setChecks((current) => current.map((value, i) => i === index ? event.target.checked : value))} />
-                {label}
-              </label>
-            ))}
-        <div className="button-row">
-              <button type="button" className="secondary" onClick={() => copyText(report)}>Copy Report</button>
-              <button type="button" className="secondary" onClick={() => copyText(emailDraft)}>Copy Email</button>
-            </div>
-            <button type="button" disabled={!readyToDraft || !allConfirmed || sending} onClick={sendEmail}>{sending ? 'Sending...' : 'Send Email'}</button>
-            <div className="button-row">
-              <button type="button" className="secondary" onClick={clearForm}>Start New Correction / Clear Form</button>
-            </div>
+              {readinessWarnings.length ? (
+                <div className="gate warn">
+                  <strong>Warnings (do not block send if required fields are complete):</strong>
+                  <ul>
+                    {readinessWarnings.map((warning) => <li key={warning}>{warning}</li>)}
+                  </ul>
+                </div>
+              ) : null}
+            </section>
+
+            <section className="draft-group">
+              <h3 className="draft-group-title">Report Preview</h3>
+              <pre>{report}</pre>
+            </section>
+
+            <section className="draft-group">
+              <h3 className="draft-group-title">Email Preview</h3>
+              <pre>{emailDraft}</pre>
+            </section>
+
+            <section className="draft-group">
+              <h3 className="draft-group-title">Confirmation Checks</h3>
+              <div className="checks-stack">
+                {confirmationLabels.map((label, index) => (
+                  <label className="check" key={label}>
+                    <input type="checkbox" checked={checks[index]} onChange={(event) => setChecks((current) => current.map((value, i) => i === index ? event.target.checked : value))} />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </section>
+
+            <section className="draft-group">
+              <h3 className="draft-group-title">Copy + Send Actions</h3>
+              <div className="button-row">
+                <button type="button" className="secondary" onClick={() => copyText(report)}>Copy Report</button>
+                <button type="button" className="secondary" onClick={() => copyText(emailDraft)}>Copy Email</button>
+              </div>
+              <button type="button" disabled={!readyToDraft || !allConfirmed || sending} onClick={sendEmail}>{sending ? 'Sending...' : 'Send Email'}</button>
+              <div className="button-row">
+                <button type="button" className="secondary" onClick={clearForm}>Start New Correction / Clear Form</button>
+              </div>
+            </section>
           </>
         ) : (
           <div className="empty-state">
