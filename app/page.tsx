@@ -823,7 +823,7 @@ ${emailBody}`;
       <div className="home-layout-column">
       <section className="hero-card glow-card home-system-hero">
         <div className="home-active-badge">SYSTEM ACTIVE</div>
-        <img className="home-system-icon" src="/refab-connect-master-1024.png" alt="Refab Connect AI-WOC" />
+        <img src="/refab-connect-master-1024.png" className="home-system-icon" alt="REFAB Connect" />
         <div className="hero-copy home-system-copy">
           <h2>Correction<br />System Active</h2>
           <p>Clear. Guided. Fast.</p>
