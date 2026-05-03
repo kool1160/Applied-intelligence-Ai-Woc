@@ -32,9 +32,34 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
+const refabHeroIcon = '/refab-connect-icons/app/refab-connect-black-neon-ios-180.png';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preload" as="image" href={refabHeroIcon} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (() => {
+                const heroIcon = '${refabHeroIcon}';
+                const fixIcon = () => {
+                  document.querySelectorAll('img.home-system-icon').forEach(img => {
+                    if (img.getAttribute('src') !== heroIcon) img.setAttribute('src', heroIcon);
+                    img.setAttribute('alt', 'REFAB Connect');
+                  });
+                };
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', fixIcon, { once: true });
+                } else {
+                  fixIcon();
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
