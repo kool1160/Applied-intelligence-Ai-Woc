@@ -1,11 +1,18 @@
-/* Refab Connect / AI-WOC visual polish
-   Scope: styling only. No workflow, extraction, report, email, or gate logic changes.
-   NOTE: This file intentionally does not force one shared Refab icon into every nav/workflow slot.
-   Approved individual icon assets should be wired as real files or explicit per-icon mappings. */
+/* Refab Connect / AI-WOC visual + icon polish
+   Scope: styling and icon mapping only. No workflow, extraction, report, email, or confirmation gate logic changes. */
 
 :root {
   --rc-main-icon: url('/refab-connect-master-1024.png');
   --rc-app-icon: url('/apple-touch-icon.png');
+  --rc-nav-home: url('/refab-connect-icons/nav/home.svg');
+  --rc-nav-capture: url('/refab-connect-icons/nav/capture.svg');
+  --rc-nav-drafts: url('/refab-connect-icons/nav/drafts.svg');
+  --rc-nav-history: url('/refab-connect-icons/nav/history.svg');
+  --rc-nav-more: url('/refab-connect-icons/nav/more.svg');
+  --rc-workflow-capture: url('/refab-connect-icons/workflow/capture-router.svg');
+  --rc-workflow-extract: url('/refab-connect-icons/workflow/extract-confirm.svg');
+  --rc-workflow-build: url('/refab-connect-icons/workflow/build-correction.svg');
+  --rc-workflow-final: url('/refab-connect-icons/workflow/final-action.svg');
 }
 
 body {
@@ -18,9 +25,7 @@ body {
     linear-gradient(180deg, #0b0d12 0%, #07090d 58%, #050608 100%);
 }
 
-.shell {
-  padding-top: 14px;
-}
+.shell { padding-top: 14px; }
 
 .glow-card,
 .panel,
@@ -57,9 +62,7 @@ body {
 .top-card,
 .hero-card,
 .workflow-card,
-.panel {
-  border-radius: 32px;
-}
+.panel { border-radius: 32px; }
 
 .brand-tile {
   background-image: var(--rc-app-icon);
@@ -73,9 +76,7 @@ body {
     inset 0 0 24px rgba(255, 255, 255, 0.06);
 }
 
-.brand-tile img {
-  opacity: 0;
-}
+.brand-tile img { opacity: 0; }
 
 .home-system-icon {
   object-fit: contain;
@@ -101,9 +102,7 @@ button,
 
 button:active,
 .capture-trigger:active,
-.workflow-row:active {
-  transform: scale(0.985);
-}
+.workflow-row:active { transform: scale(0.985); }
 
 button:not(:disabled):hover,
 .capture-trigger:hover,
@@ -134,9 +133,7 @@ textarea:focus {
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.section-title {
-  margin-bottom: 16px;
-}
+.section-title { margin-bottom: 16px; }
 
 .section-title span {
   background: linear-gradient(180deg, #6ea5ff, #ef4e54);
@@ -159,15 +156,33 @@ textarea:focus {
   overflow: hidden;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 72%;
+  background-size: 76%;
 }
 
 .workflow-row .step-box,
 .capture-trigger .glass-icon-tile,
-.bottom-nav .nav-icon {
-  color: var(--soft-blue);
-  text-shadow: 0 0 8px rgba(246, 248, 250, 0.28);
+.bottom-nav .nav-icon,
+.bottom-nav .glass-icon-tile {
+  color: transparent;
+  text-shadow: none;
 }
+
+.workflow-row .step-box,
+.capture-trigger .glass-icon-tile {
+  border-color: rgba(204, 223, 255, 0.52);
+  background-color: rgba(10, 14, 22, 0.66);
+}
+
+.home-workflow .workflow-row:nth-of-type(1) .step-box,
+.workflow-card .workflow-row:nth-of-type(1) .step-box,
+.capture-trigger .glass-icon-tile,
+.home-start-button .glass-icon-tile { background-image: var(--rc-workflow-capture); }
+.home-workflow .workflow-row:nth-of-type(2) .step-box,
+.workflow-card .workflow-row:nth-of-type(2) .step-box { background-image: var(--rc-workflow-extract); }
+.home-workflow .workflow-row:nth-of-type(3) .step-box,
+.workflow-card .workflow-row:nth-of-type(3) .step-box { background-image: var(--rc-workflow-build); }
+.home-workflow .workflow-row:nth-of-type(4) .step-box,
+.workflow-card .workflow-row:nth-of-type(4) .step-box { background-image: var(--rc-workflow-final); }
 
 .bottom-nav {
   gap: 7px;
@@ -189,17 +204,28 @@ textarea:focus {
   border: 1px solid transparent;
 }
 
-.bottom-nav .glass-icon-tile {
+.bottom-nav .glass-icon-tile,
+.bottom-nav .nav-icon {
   width: 32px;
   height: 32px;
   min-width: 32px;
   border-radius: 11px;
   border-color: rgba(154, 165, 181, 0.3);
-  background-image: none;
-  background-size: 82%;
+  background-size: 84%;
   background-position: center;
   background-repeat: no-repeat;
 }
+
+.bottom-nav button:nth-child(1) .glass-icon-tile,
+.bottom-nav button:nth-child(1) .nav-icon { background-image: var(--rc-nav-home); }
+.bottom-nav button:nth-child(2) .glass-icon-tile,
+.bottom-nav button:nth-child(2) .nav-icon { background-image: var(--rc-nav-capture); }
+.bottom-nav button:nth-child(3) .glass-icon-tile,
+.bottom-nav button:nth-child(3) .nav-icon { background-image: var(--rc-nav-drafts); }
+.bottom-nav button:nth-child(4) .glass-icon-tile,
+.bottom-nav button:nth-child(4) .nav-icon { background-image: var(--rc-nav-history); }
+.bottom-nav button:nth-child(5) .glass-icon-tile,
+.bottom-nav button:nth-child(5) .nav-icon { background-image: var(--rc-nav-more); }
 
 .bottom-nav button.active {
   color: var(--blue-2);
@@ -207,18 +233,16 @@ textarea:focus {
   border-color: rgba(204, 223, 255, 0.46);
 }
 
-.bottom-nav button.active .glass-icon-tile {
+.bottom-nav button.active .glass-icon-tile,
+.bottom-nav button.active .nav-icon {
   border-color: rgba(204, 223, 255, 0.76);
-  background-size: 88%;
+  background-size: 90%;
   box-shadow:
     0 0 16px rgba(75, 141, 255, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
-.bottom-nav button.active::after {
-  width: 5px;
-  height: 5px;
-}
+.bottom-nav button.active::after { width: 5px; height: 5px; }
 
 .status {
   border-color: rgba(214, 221, 228, 0.34);
@@ -226,29 +250,19 @@ textarea:focus {
 }
 
 @media (max-width: 620px) {
-  .shell {
-    padding-left: 13px;
-    padding-right: 13px;
-  }
+  .shell { padding-left: 13px; padding-right: 13px; }
 
   .top-card,
   .hero-card,
   .workflow-card,
-  .panel {
-    border-radius: 28px;
-  }
+  .panel { border-radius: 28px; }
 
-  .bottom-nav {
-    gap: 5px;
-    padding: 8px;
-  }
+  .bottom-nav { gap: 5px; padding: 8px; }
 
-  .bottom-nav button {
-    min-height: 58px;
-    font-size: 10px;
-  }
+  .bottom-nav button { min-height: 58px; font-size: 10px; }
 
-  .bottom-nav .glass-icon-tile {
+  .bottom-nav .glass-icon-tile,
+  .bottom-nav .nav-icon {
     width: 29px;
     height: 29px;
     min-width: 29px;
