@@ -1,0 +1,259 @@
+/* Refab Connect / AI-WOC visual + icon polish
+   Scope: styling only. No workflow, extraction, report, email, or gate logic changes. */
+
+:root {
+  --rc-main-icon: url('/refab-connect-master-1024.png');
+  --rc-app-icon: url('/apple-touch-icon.png');
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  background:
+    radial-gradient(circle at 50% -12%, rgba(239, 78, 84, 0.14), transparent 32%),
+    radial-gradient(circle at 12% 18%, rgba(75, 141, 255, 0.12), transparent 28%),
+    radial-gradient(circle at 92% 4%, rgba(34, 223, 146, 0.08), transparent 24%),
+    linear-gradient(180deg, #0b0d12 0%, #07090d 58%, #050608 100%);
+}
+
+.shell {
+  padding-top: 14px;
+}
+
+.glow-card,
+.panel,
+.workflow-card,
+.template-card,
+.gate,
+.build-section,
+.draft-group,
+.quick-entry-card,
+.vision-status-card,
+.capture-trigger,
+.workflow-row,
+.history-list li,
+.status {
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.glow-card,
+.panel,
+.workflow-card {
+  border-color: rgba(220, 229, 239, 0.38);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(241, 74, 79, 0.1), transparent 28%),
+    radial-gradient(circle at 8% 0%, rgba(75, 141, 255, 0.1), transparent 32%),
+    linear-gradient(145deg, rgba(34, 38, 47, 0.82), rgba(9, 11, 16, 0.94));
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.045),
+    0 16px 36px rgba(0, 0, 0, 0.38),
+    0 0 30px rgba(209, 50, 57, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.075);
+}
+
+.top-card,
+.hero-card,
+.workflow-card,
+.panel {
+  border-radius: 32px;
+}
+
+.brand-tile {
+  background-image: var(--rc-app-icon);
+  background-size: cover;
+  background-position: center;
+  border-color: rgba(139, 205, 255, 0.74);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 30px rgba(75, 141, 255, 0.22),
+    0 0 34px rgba(209, 50, 57, 0.38),
+    inset 0 0 24px rgba(255, 255, 255, 0.06);
+}
+
+.brand-tile img {
+  opacity: 0;
+}
+
+.home-system-icon {
+  object-fit: contain;
+  background: rgba(10, 12, 18, 0.32);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.44),
+    0 0 34px rgba(75, 141, 255, 0.2),
+    0 0 42px rgba(209, 50, 57, 0.18);
+}
+
+button,
+.empty-state a,
+.capture-trigger,
+.workflow-row,
+.bottom-nav button {
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease,
+    opacity 0.16s ease;
+}
+
+button:active,
+.capture-trigger:active,
+.workflow-row:active {
+  transform: scale(0.985);
+}
+
+button:not(:disabled):hover,
+.capture-trigger:hover,
+.workflow-row:hover {
+  border-color: rgba(235, 241, 248, 0.52);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.32),
+    0 0 22px rgba(75, 141, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+input,
+select,
+textarea,
+pre {
+  border-color: rgba(217, 225, 234, 0.28);
+  background: linear-gradient(180deg, rgba(17, 20, 27, 0.96), rgba(8, 10, 15, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(116, 166, 255, 0.82);
+  box-shadow:
+    0 0 0 3px rgba(75, 141, 255, 0.16),
+    0 0 18px rgba(75, 141, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.section-title {
+  margin-bottom: 16px;
+}
+
+.section-title span {
+  background: linear-gradient(180deg, #6ea5ff, #ef4e54);
+  box-shadow:
+    0 0 18px rgba(75, 141, 255, 0.62),
+    0 0 22px rgba(209, 50, 57, 0.42);
+}
+
+.workflow-row {
+  border-color: rgba(214, 220, 227, 0.3);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(75, 141, 255, 0.1), transparent 36%),
+    linear-gradient(145deg, rgba(36, 41, 50, 0.76), rgba(11, 13, 18, 0.92));
+}
+
+.step-box,
+.nav-icon,
+.stat-icon,
+.capture-trigger .glass-icon-tile {
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 72%;
+}
+
+.workflow-row .step-box,
+.capture-trigger .glass-icon-tile,
+.bottom-nav .nav-icon {
+  color: transparent;
+  text-shadow: none;
+}
+
+.workflow-row .step-box,
+.capture-trigger .glass-icon-tile {
+  background-image: var(--rc-main-icon);
+}
+
+.bottom-nav {
+  gap: 7px;
+  padding: 9px 10px;
+  border-color: rgba(224, 232, 241, 0.42);
+  background:
+    linear-gradient(180deg, rgba(43, 48, 58, 0.72), rgba(10, 12, 17, 0.84)),
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.13), transparent 52%);
+  box-shadow:
+    0 -12px 36px rgba(2, 8, 20, 0.56),
+    0 0 26px rgba(75, 141, 255, 0.12),
+    0 0 42px rgba(209, 50, 57, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(5, 6, 9, 0.82);
+}
+
+.bottom-nav button {
+  min-height: 62px;
+  border: 1px solid transparent;
+}
+
+.bottom-nav .glass-icon-tile {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 11px;
+  border-color: rgba(154, 165, 181, 0.3);
+  background-image: var(--rc-app-icon);
+  background-size: 82%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.bottom-nav button.active {
+  color: var(--blue-2);
+  background: linear-gradient(180deg, rgba(75, 141, 255, 0.26), rgba(16, 21, 31, 0.74));
+  border-color: rgba(204, 223, 255, 0.46);
+}
+
+.bottom-nav button.active .glass-icon-tile {
+  border-color: rgba(204, 223, 255, 0.76);
+  background-size: 88%;
+  box-shadow:
+    0 0 16px rgba(75, 141, 255, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.bottom-nav button.active::after {
+  width: 5px;
+  height: 5px;
+}
+
+.status {
+  border-color: rgba(214, 221, 228, 0.34);
+  background: linear-gradient(180deg, rgba(31, 36, 45, 0.92), rgba(11, 13, 18, 0.95));
+}
+
+@media (max-width: 620px) {
+  .shell {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .top-card,
+  .hero-card,
+  .workflow-card,
+  .panel {
+    border-radius: 28px;
+  }
+
+  .bottom-nav {
+    gap: 5px;
+    padding: 8px;
+  }
+
+  .bottom-nav button {
+    min-height: 58px;
+    font-size: 10px;
+  }
+
+  .bottom-nav .glass-icon-tile {
+    width: 29px;
+    height: 29px;
+    min-width: 29px;
+  }
+}
