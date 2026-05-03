@@ -1053,59 +1053,71 @@ ${emailBody}`;
         </div>
       </section>
 
-      <section className="panel glow-card" id="issue">
+      <section className="panel glow-card build-correction-panel" id="issue">
         <div className="panel-heading">
           <p>Step 3</p>
-          <h2>State Issue</h2>
+          <h2>Build Correction</h2>
         </div>
-        <label>
-          Correction Type
-          <select value={data.correctionType} onChange={(event) => applyCorrectionType(event.target.value)}>
-            {correctionTypeOptions.map((item) => <option key={item}>{item}</option>)}
-          </select>
-        </label>
-        {data.correctionType === 'Incorrect Time / Rate' ? (
-          <>
-            <label>Current Listed Rate<input value={data.currentListedRate} onChange={(event) => setField('currentListedRate', event.target.value)} /></label>
-            <label>Correct / Observed Rate<input value={data.observedBaseline} onChange={(event) => setField('observedBaseline', event.target.value)} /></label>
-            <label>Operation / Process<select value={data.process} onChange={(event) => setField('process', event.target.value)}><option value="">Select operation / process</option>{operationProcessOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
-          </>
-        ) : null}
-        {(data.correctionType === 'Missing Grind / Finish Operation' || data.correctionType === 'Missing Weld Operation') ? (
-          <>
-            <label>Correct / Observed Rate<input value={data.observedBaseline} onChange={(event) => setField('observedBaseline', event.target.value)} /></label>
-            <label>Optional note<textarea value={data.optionalNote} onChange={(event) => setField('optionalNote', event.target.value)} /></label>
-          </>
-        ) : null}
-        {data.correctionType === 'Missing Fixture / Work Instruction' ? <label>Optional note<textarea value={data.optionalNote} onChange={(event) => setField('optionalNote', event.target.value)} /></label> : null}
-        {data.correctionType === 'Wrong / Missing Router Step' ? (
-          <>
-            <label>Operation / Process<select value={data.process} onChange={(event) => setField('process', event.target.value)}><option value="">Select operation / process</option>{operationProcessOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
-            <label>Optional note<textarea value={data.optionalNote} onChange={(event) => setField('optionalNote', event.target.value)} /></label>
-          </>
-        ) : null}
-        <label>
-          Category
-          <select value={data.category} onChange={(event) => setField('category', event.target.value)}>
-            <option value="">Select category</option>
-            {categoryOptions.map((item) => <option key={item}>{item}</option>)}
-          </select>
-        </label>
-        <label>
-          Priority
-          <select value={data.priority} onChange={(event) => setField('priority', event.target.value)}>
-            {priorityOptions.map((item) => <option key={item}>{item}</option>)}
-          </select>
-        </label>
-        <label>
-          Problem Summary
-          <textarea value={data.problemSummary} onChange={(event) => setField('problemSummary', event.target.value)} />
-        </label>
-        <label>
-          Requested Engineering Action
-          <textarea value={data.requestedAction} onChange={(event) => setField('requestedAction', event.target.value)} />
-        </label>
-        <button type="button" onClick={generateDraft}>Generate Report + Email Draft</button>
+        <div className="build-section">
+          <h3>Correction Type</h3>
+          <label>
+            Correction Type
+            <select value={data.correctionType} onChange={(event) => applyCorrectionType(event.target.value)}>
+              {correctionTypeOptions.map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </label>
+          {data.correctionType === 'Incorrect Time / Rate' ? (
+            <>
+              <label>Current Listed Rate<input value={data.currentListedRate} onChange={(event) => setField('currentListedRate', event.target.value)} /></label>
+              <label>Correct / Observed Rate<input value={data.observedBaseline} onChange={(event) => setField('observedBaseline', event.target.value)} /></label>
+              <label>Operation / Process<select value={data.process} onChange={(event) => setField('process', event.target.value)}><option value="">Select operation / process</option>{operationProcessOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+            </>
+          ) : null}
+          {(data.correctionType === 'Missing Grind / Finish Operation' || data.correctionType === 'Missing Weld Operation') ? (
+            <>
+              <label>Correct / Observed Rate<input value={data.observedBaseline} onChange={(event) => setField('observedBaseline', event.target.value)} /></label>
+              <label>Optional note<textarea value={data.optionalNote} onChange={(event) => setField('optionalNote', event.target.value)} /></label>
+            </>
+          ) : null}
+          {data.correctionType === 'Missing Fixture / Work Instruction' ? <label>Optional note<textarea value={data.optionalNote} onChange={(event) => setField('optionalNote', event.target.value)} /></label> : null}
+          {data.correctionType === 'Wrong / Missing Router Step' ? (
+            <>
+              <label>Operation / Process<select value={data.process} onChange={(event) => setField('process', event.target.value)}><option value="">Select operation / process</option>{operationProcessOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+              <label>Optional note<textarea value={data.optionalNote} onChange={(event) => setField('optionalNote', event.target.value)} /></label>
+            </>
+          ) : null}
+        </div>
+        <div className="build-section">
+          <h3>Issue Details</h3>
+          <label>
+            Category
+            <select value={data.category} onChange={(event) => setField('category', event.target.value)}>
+              <option value="">Select category</option>
+              {categoryOptions.map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </label>
+          <label>
+            Priority
+            <select value={data.priority} onChange={(event) => setField('priority', event.target.value)}>
+              {priorityOptions.map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </label>
+          <label>
+            Problem Summary
+            <textarea value={data.problemSummary} onChange={(event) => setField('problemSummary', event.target.value)} />
+          </label>
+        </div>
+        <div className="build-section">
+          <h3>Requested Engineering Action</h3>
+          <label>
+            Requested Engineering Action
+            <textarea value={data.requestedAction} onChange={(event) => setField('requestedAction', event.target.value)} />
+          </label>
+        </div>
+        <div className="build-section build-section-cta">
+          <h3>Generate Draft</h3>
+          <button type="button" onClick={generateDraft}>Generate Report + Email Draft</button>
+        </div>
       </section>
       </>
       ) : null}
