@@ -48,18 +48,18 @@ const confirmationLabels = [
 type TaskView = 'Home' | 'Capture' | 'Build Correction' | 'Drafts' | 'History' | 'More';
 
 const workflow: [string, string, string, TaskView][] = [
-  ['📷', 'Capture Router', 'Snap or upload work order.', 'Capture'],
-  ['📋', 'Extract + Confirm', 'Pull WO, part, process, and rate into clean fields.', 'Capture'],
-  ['🗂', 'Build Correction', 'Generate report and Engineering email draft.', 'Build Correction'],
-  ['➤', 'Confirm + Send', 'Draft first. Confirm accuracy. Then send.', 'Drafts'],
+  ['ð·', 'Capture Router', 'Snap or upload work order.', 'Capture'],
+  ['ð', 'Extract + Confirm', 'Pull WO, part, process, and rate into clean fields.', 'Capture'],
+  ['ð', 'Build Correction', 'Generate report and Engineering email draft.', 'Build Correction'],
+  ['â¤', 'Confirm + Send', 'Draft first. Confirm accuracy. Then send.', 'Drafts'],
 ];
 
 const navItems: [string, TaskView][] = [
-  ['⌂', 'Home'],
-  ['📷', 'Capture'],
-  ['🗂', 'Drafts'],
-  ['◷', 'History'],
-  ['⚙', 'More'],
+  ['â', 'Home'],
+  ['ð·', 'Capture'],
+  ['ð', 'Drafts'],
+  ['â·', 'History'],
+  ['â', 'More'],
 ];
 
 const correctionTypeOptions = [
@@ -542,7 +542,7 @@ export default function Home() {
     return `ENGINEERING WORK ORDER CORRECTION REPORT
 
 Title:
-${data.workOrder || '[WO REQUIRED]'} / ${data.partNumber || '[PART REQUIRED]'} – ${data.correctionType} Correction Request
+${data.workOrder || '[WO REQUIRED]'} / ${data.partNumber || '[PART REQUIRED]'} â ${data.correctionType} Correction Request
 
 Correction Type:
 ${data.correctionType}
@@ -639,7 +639,7 @@ Customer:
 ${data.customer || '[N/A]'}
 
 Operation:
-${data.operation || '[VERIFY OPERATION]'} – ${data.process || '[VERIFY PROCESS]'}
+${data.operation || '[VERIFY OPERATION]'} â ${data.process || '[VERIFY PROCESS]'}
 
 Issue Summary:
 ${data.problemSummary || '[PROBLEM SUMMARY REQUIRED]'}
@@ -803,7 +803,7 @@ ${emailBody}`;
           <p>Clear. Guided. Fast.</p>
         </div>
         <button type="button" className="capture-trigger home-start-button" onClick={() => resetForNewCorrection('Capture')}>
-          <span className="glass-icon-tile active">📷</span>
+          <span className="glass-icon-tile active">ð·</span>
           <span>
             <strong>Start Capture</strong>
           </span>
@@ -865,14 +865,14 @@ ${emailBody}`;
         <div className="capture-section">
           <h3>1. Take Photo / Upload</h3>
           <button type="button" className="capture-trigger" onClick={() => takePhotoInputRef.current?.click()}>
-          <span className="glass-icon-tile active">📷</span>
+          <span className="glass-icon-tile active">ð·</span>
           <span>
             <strong>Take Photo</strong>
             <small>Use rear camera to capture work order.</small>
           </span>
           </button>
           <button type="button" className="capture-trigger" onClick={() => uploadInputRef.current?.click()}>
-          <span className="glass-icon-tile">📁</span>
+          <span className="glass-icon-tile">ð</span>
           <span>
             <strong>Upload File / Picture</strong>
             <small>Select image or PDF from Photo Library or Files.</small>
@@ -893,7 +893,7 @@ ${emailBody}`;
             disabled={!selectedImageFile || visionLoading}
             onClick={extractWithVision}
           >
-            {visionLoading ? 'Extracting Vision…' : 'Extract With AI Vision'}
+            {visionLoading ? 'Extracting Visionâ¦' : 'Extract With AI Vision'}
           </button>
           <button
             type="button"
@@ -901,7 +901,7 @@ ${emailBody}`;
             disabled={!selectedImageFile || ocrLoading}
             onClick={extractTextFromPhoto}
           >
-            {ocrLoading ? 'Extracting Text…' : 'Basic OCR Fallback'}
+            {ocrLoading ? 'Extracting Textâ¦' : 'Basic OCR Fallback'}
           </button>
           </div>
         {visionDebugMessage ? (
@@ -909,11 +909,11 @@ ${emailBody}`;
             <p>{visionDebugMessage}</p>
             {lastVisionResult ? (
               <dl>
-                <div><dt>Work Order</dt><dd>{lastVisionResult.workOrder || '—'}</dd></div>
-                <div><dt>Part Number</dt><dd>{lastVisionResult.partNumber || '—'}</dd></div>
-                <div><dt>Revision</dt><dd>{lastVisionResult.revision || '—'}</dd></div>
-                <div><dt>Customer</dt><dd>{lastVisionResult.customer || '—'}</dd></div>
-                <div><dt>Quantity</dt><dd>{lastVisionResult.quantity || '—'}</dd></div>
+                <div><dt>Work Order</dt><dd>{lastVisionResult.workOrder || 'â'}</dd></div>
+                <div><dt>Part Number</dt><dd>{lastVisionResult.partNumber || 'â'}</dd></div>
+                <div><dt>Revision</dt><dd>{lastVisionResult.revision || 'â'}</dd></div>
+                <div><dt>Customer</dt><dd>{lastVisionResult.customer || 'â'}</dd></div>
+                <div><dt>Quantity</dt><dd>{lastVisionResult.quantity || 'â'}</dd></div>
                 <div><dt>Needs Review</dt><dd>{lastVisionResult.needsReview.length ? lastVisionResult.needsReview.join(', ') : 'None'}</dd></div>
               </dl>
             ) : null}
@@ -1174,7 +1174,7 @@ ${emailBody}`;
           <ul className="history-list">
             {history.map((item) => (
               <li key={item.wocId}>
-                <strong>{item.wocId}</strong> — {item.dateSubmitted} — WO {item.workOrderNumber || 'TBD'} / {item.partNumber || 'TBD'} — {item.category} — {item.status}
+                <strong>{item.wocId}</strong> â {item.dateSubmitted} â WO {item.workOrderNumber || 'TBD'} / {item.partNumber || 'TBD'} â {item.category} â {item.status}
               </li>
             ))}
           </ul>
