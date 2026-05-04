@@ -2,7 +2,7 @@
    Scope: styling and icon mapping only. No workflow, extraction, report, email, or confirmation gate logic changes. */
 
 :root {
-  --rc-main-icon: url('/refab-connect-master-1024.png');
+  --rc-main-icon: url('/refab-connect-master-1024.png?v=3');
   --rc-app-icon: url('/apple-touch-icon.png');
   --rc-nav-home: url('/refab-connect-icons/nav/home.svg');
   --rc-nav-capture: url('/refab-connect-icons/nav/capture.svg');
@@ -79,8 +79,14 @@ body {
 .brand-tile img { opacity: 0; }
 
 .home-system-icon {
+  content: var(--rc-main-icon);
+  display: block;
   object-fit: contain;
-  background: rgba(10, 12, 18, 0.32);
+  background-color: rgba(10, 12, 18, 0.32);
+  background-image: var(--rc-main-icon);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
   box-shadow:
     0 18px 42px rgba(0, 0, 0, 0.44),
     0 0 34px rgba(75, 141, 255, 0.2),
