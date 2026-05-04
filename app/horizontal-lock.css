@@ -22,7 +22,6 @@ main.shell {
   margin-left: auto;
   margin-right: auto;
   overflow-x: clip;
-  contain: paint;
 }
 
 .shell {
@@ -91,8 +90,8 @@ select,
 
 /* PR #82 conflict resolution: keep the approved compact Home layout without replacing the real img logo. */
 #home:has(.home-system-hero) {
-  padding-bottom: 238px;
-  scroll-padding-bottom: 238px;
+  padding-bottom: 220px;
+  scroll-padding-bottom: 220px;
 }
 
 #home .home-system-hero {
@@ -196,8 +195,8 @@ select,
   }
 
   #home:has(.home-system-hero) {
-    padding-bottom: 248px;
-    scroll-padding-bottom: 248px;
+    padding-bottom: 228px;
+    scroll-padding-bottom: 228px;
   }
 
   #home .home-system-hero {
