@@ -31,7 +31,7 @@ const OPTIONAL_PLACEHOLDERS = [
 ];
 
 function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
 function cleanOptionalBlocks(text: string) {
