@@ -798,7 +798,7 @@ ${emailBody}`;
       setHistory((current) => [record, ...current].slice(0, 8));
       setNextWocId((current) => current + 1);
       setStatus('Email sent successfully.');
-      setActiveView('Drafts');
+      setActiveView('History');
     }
 
     setSending(false);
