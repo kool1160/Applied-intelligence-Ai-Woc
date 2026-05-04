@@ -341,6 +341,23 @@ export default function Home() {
   const [nextWocId, setNextWocId] = useState(1);
   const [activeView, setActiveView] = useState<TaskView>('Home');
 
+  const resetForNewCorrection = (nextView: TaskView = 'Capture') => {
+    setData(blank);
+    setImageUrl('');
+    setSelectedFileName('');
+    setSelectedImageFile(null);
+    setRouterText('');
+    setShowDraft(false);
+    setChecks(Array(5).fill(false));
+    setStatus('');
+    setSending(false);
+    setVisionDebugMessage('');
+    setLastVisionResult(null);
+    if (takePhotoInputRef.current) takePhotoInputRef.current.value = '';
+    if (uploadInputRef.current) uploadInputRef.current.value = '';
+    setActiveView(nextView);
+  };
+
   const setField = (field: keyof WocData, value: string) => {
     setData((current) => ({ ...current, [field]: value }));
     setChecks(Array(5).fill(false));
@@ -372,17 +389,7 @@ export default function Home() {
   };
 
   const clearForm = () => {
-    setData(blank);
-    setImageUrl('');
-    setSelectedFileName('');
-    setSelectedImageFile(null);
-    setRouterText('');
-    setShowDraft(false);
-    setChecks(Array(5).fill(false));
-    setStatus('');
-    setVisionDebugMessage('');
-    setLastVisionResult(null);
-    setActiveView('Capture');
+    resetForNewCorrection('Capture');
   };
 
   const extractData = () => {
@@ -828,7 +835,7 @@ ${emailBody}`;
           <h2>Correction<br />System Active</h2>
           <p>Clear. Guided. Fast.</p>
         </div>
-        <button type="button" className="capture-trigger home-start-button" onClick={() => setActiveView('Capture')}>
+        <button type="button" className="capture-trigger home-start-button" onClick={() => resetForNewCorrection('Capture')}>
           <span className="glass-icon-tile active">📷</span>
           <span>
             <strong>Start Capture</strong>
