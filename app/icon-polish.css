@@ -2,7 +2,7 @@
    Scope: styling and icon mapping only. No workflow, extraction, report, email, or confirmation gate logic changes. */
 
 :root {
-  --rc-main-icon: url('/refab-connect-master-1024.png?v=3');
+  --rc-main-icon: url('/refab-connect-master-1024.png');
   --rc-app-icon: url('/apple-touch-icon.png');
   --rc-nav-home: url('/refab-connect-icons/nav/home.svg');
   --rc-nav-capture: url('/refab-connect-icons/nav/capture.svg');
@@ -40,23 +40,23 @@ body {
 .workflow-row,
 .history-list li,
 .status {
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(135%);
+  -webkit-backdrop-filter: blur(16px) saturate(135%);
 }
 
 .glow-card,
 .panel,
 .workflow-card {
-  border-color: rgba(220, 229, 239, 0.38);
+  border-color: rgba(220, 229, 239, 0.34);
   background:
-    radial-gradient(circle at 100% 0%, rgba(241, 74, 79, 0.1), transparent 28%),
-    radial-gradient(circle at 8% 0%, rgba(75, 141, 255, 0.1), transparent 32%),
+    radial-gradient(circle at 100% 0%, rgba(241, 74, 79, 0.08), transparent 28%),
+    radial-gradient(circle at 8% 0%, rgba(75, 141, 255, 0.08), transparent 32%),
     linear-gradient(145deg, rgba(34, 38, 47, 0.82), rgba(9, 11, 16, 0.94));
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.045),
-    0 16px 36px rgba(0, 0, 0, 0.38),
-    0 0 30px rgba(209, 50, 57, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.075);
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 12px 26px rgba(0, 0, 0, 0.34),
+    0 0 18px rgba(209, 50, 57, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 .top-card,
@@ -71,21 +71,22 @@ body {
   border-color: rgba(139, 205, 255, 0.74);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.1),
-    0 0 30px rgba(75, 141, 255, 0.22),
-    0 0 34px rgba(209, 50, 57, 0.38),
-    inset 0 0 24px rgba(255, 255, 255, 0.06);
+    0 0 22px rgba(75, 141, 255, 0.18),
+    0 0 26px rgba(209, 50, 57, 0.26),
+    inset 0 0 18px rgba(255, 255, 255, 0.05);
 }
 
 .brand-tile img { opacity: 0; }
 
 .home-system-icon {
   display: block;
+  content: var(--rc-main-icon);
   object-fit: contain;
   background-color: rgba(10, 12, 18, 0.32);
   box-shadow:
-    0 18px 42px rgba(0, 0, 0, 0.44),
-    0 0 34px rgba(75, 141, 255, 0.2),
-    0 0 42px rgba(209, 50, 57, 0.18);
+    0 12px 26px rgba(0, 0, 0, 0.34),
+    0 0 20px rgba(75, 141, 255, 0.14),
+    0 0 24px rgba(209, 50, 57, 0.12);
 }
 
 button,
@@ -94,25 +95,25 @@ button,
 .workflow-row,
 .bottom-nav button {
   transition:
-    transform 0.16s ease,
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    background 0.16s ease,
-    opacity 0.16s ease;
+    transform 0.14s ease,
+    border-color 0.14s ease,
+    box-shadow 0.14s ease,
+    background 0.14s ease,
+    opacity 0.14s ease;
 }
 
 button:active,
 .capture-trigger:active,
-.workflow-row:active { transform: scale(0.985); }
+.workflow-row:active { transform: scale(0.992); }
 
 button:not(:disabled):hover,
 .capture-trigger:hover,
 .workflow-row:hover {
-  border-color: rgba(235, 241, 248, 0.52);
+  border-color: rgba(235, 241, 248, 0.48);
   box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.32),
-    0 0 22px rgba(75, 141, 255, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 8px 18px rgba(0, 0, 0, 0.28),
+    0 0 14px rgba(75, 141, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 input,
@@ -130,7 +131,7 @@ textarea:focus {
   border-color: rgba(116, 166, 255, 0.82);
   box-shadow:
     0 0 0 3px rgba(75, 141, 255, 0.16),
-    0 0 18px rgba(75, 141, 255, 0.22),
+    0 0 14px rgba(75, 141, 255, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -139,14 +140,14 @@ textarea:focus {
 .section-title span {
   background: linear-gradient(180deg, #6ea5ff, #ef4e54);
   box-shadow:
-    0 0 18px rgba(75, 141, 255, 0.62),
-    0 0 22px rgba(209, 50, 57, 0.42);
+    0 0 14px rgba(75, 141, 255, 0.42),
+    0 0 14px rgba(209, 50, 57, 0.28);
 }
 
 .workflow-row {
   border-color: rgba(214, 220, 227, 0.3);
   background:
-    radial-gradient(circle at 0% 0%, rgba(75, 141, 255, 0.1), transparent 36%),
+    radial-gradient(circle at 0% 0%, rgba(75, 141, 255, 0.08), transparent 36%),
     linear-gradient(145deg, rgba(36, 41, 50, 0.76), rgba(11, 13, 18, 0.92));
 }
 
@@ -193,10 +194,10 @@ textarea:focus {
     linear-gradient(180deg, rgba(43, 48, 58, 0.72), rgba(10, 12, 17, 0.84)),
     radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.13), transparent 52%);
   box-shadow:
-    0 -12px 36px rgba(2, 8, 20, 0.56),
-    0 0 26px rgba(75, 141, 255, 0.12),
-    0 0 42px rgba(209, 50, 57, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 -8px 24px rgba(2, 8, 20, 0.46),
+    0 0 18px rgba(75, 141, 255, 0.08),
+    0 0 24px rgba(209, 50, 57, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
     inset 0 -1px 0 rgba(5, 6, 9, 0.82);
 }
 
@@ -230,17 +231,17 @@ textarea:focus {
 
 .bottom-nav button.active {
   color: var(--blue-2);
-  background: linear-gradient(180deg, rgba(75, 141, 255, 0.26), rgba(16, 21, 31, 0.74));
-  border-color: rgba(204, 223, 255, 0.46);
+  background: linear-gradient(180deg, rgba(75, 141, 255, 0.24), rgba(16, 21, 31, 0.72));
+  border-color: rgba(204, 223, 255, 0.42);
 }
 
 .bottom-nav button.active .glass-icon-tile,
 .bottom-nav button.active .nav-icon {
-  border-color: rgba(204, 223, 255, 0.76);
+  border-color: rgba(204, 223, 255, 0.7);
   background-size: 90%;
   box-shadow:
-    0 0 16px rgba(75, 141, 255, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    0 0 10px rgba(75, 141, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .bottom-nav button.active::after { width: 5px; height: 5px; }
@@ -257,6 +258,23 @@ textarea:focus {
   .hero-card,
   .workflow-card,
   .panel { border-radius: 28px; }
+
+  .glow-card,
+  .panel,
+  .workflow-card,
+  .template-card,
+  .gate,
+  .build-section,
+  .draft-group,
+  .quick-entry-card,
+  .vision-status-card,
+  .capture-trigger,
+  .workflow-row,
+  .history-list li,
+  .status {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 
   .bottom-nav { gap: 5px; padding: 8px; }
 
