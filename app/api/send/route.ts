@@ -4,7 +4,7 @@ import { cleanAiwocOutput, hasMissingRequiredAiwocFields } from '../../../featur
 
 export async function POST(req: Request) {
   try {
-    const { subject, emailBody } = await req.json();
+    const { subject, emailBody, rawEmailBody } = await req.json();
 
     if (typeof subject !== 'string' || typeof emailBody !== 'string') {
       return NextResponse.json(
@@ -14,23 +14,24 @@ export async function POST(req: Request) {
     }
 
     const trimmedSubject = subject.trim();
-    const rawEmailBody = emailBody.trim();
+    const cleanedBodyInput = emailBody.trim();
+    const validationBody = typeof rawEmailBody === 'string' ? rawEmailBody.trim() : cleanedBodyInput;
 
-    if (!trimmedSubject || !rawEmailBody) {
+    if (!trimmedSubject || !cleanedBodyInput || !validationBody) {
       return NextResponse.json(
         { error: 'subject and emailBody are required.' },
         { status: 400 }
       );
     }
 
-    if (hasMissingRequiredAiwocFields(trimmedSubject, rawEmailBody)) {
+    if (hasMissingRequiredAiwocFields(trimmedSubject, validationBody)) {
       return NextResponse.json(
         { error: 'Required correction fields are missing. Complete the request and confirmation checks before sending.' },
         { status: 400 }
       );
     }
 
-    const trimmedEmailBody = cleanAiwocOutput(rawEmailBody);
+    const trimmedEmailBody = cleanAiwocOutput(cleanedBodyInput);
 
     const apiKey = process.env.RESEND_API_KEY;
     const from = process.env.AI_WOC_FROM_EMAIL;
