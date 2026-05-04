@@ -16,16 +16,30 @@
   --muted: #aab3c2;
   --quiet: #707a88;
   --dark-text: #03070c;
-  --rc-main-icon: url('/refab-connect-master-1024.png?v=4');
-  --rc-app-icon: url('/refab-connect-master-1024.png?v=4');
+  --rc-main-icon: url('/refab-connect-master-1024.png?v=5');
+  --rc-app-icon: url('/refab-connect-master-1024.png?v=5');
 }
 
 .home-system-icon {
-  display: block;
-  width: clamp(150px, 44vw, 236px);
-  height: auto;
-  object-fit: contain;
-  background: transparent !important;
+  display: block !important;
+  width: clamp(150px, 44vw, 236px) !important;
+  height: clamp(150px, 44vw, 236px) !important;
+  min-width: clamp(150px, 44vw, 236px) !important;
+  min-height: clamp(150px, 44vw, 236px) !important;
+  aspect-ratio: 1 / 1;
+  object-fit: cover !important;
+  object-position: center !important;
+  background-color: #03070c !important;
+  background-image: var(--rc-main-icon) !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border-radius: 34px;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  text-indent: -9999px !important;
+  overflow: hidden !important;
   border-color: rgba(255, 45, 45, 0.62) !important;
   box-shadow:
     0 0 28px rgba(255, 45, 45, 0.72),
@@ -34,7 +48,7 @@
 }
 
 .home-system-icon[src] {
-  content: normal !important;
+  content: var(--rc-main-icon) !important;
 }
 
 .brand-tile {
