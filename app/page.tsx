@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
+import { blankWocData, defaultConfirmations, resetWocState, type WocData } from '../features/woc/state/wocState';
 
 declare global {
   interface Window {
@@ -12,25 +13,6 @@ declare global {
 
 
 
-type WocData = {
-  workOrder: string;
-  partNumber: string;
-  revision: string;
-  customer: string;
-  quantity: string;
-  department: string;
-  operation: string;
-  process: string;
-  currentListedRate: string;
-  observedBaseline: string;
-  issueType: string;
-  correctionType: string;
-  category: string;
-  priority: string;
-  problemSummary: string;
-  requestedAction: string;
-  optionalNote: string;
-};
 
 type SubmissionRecord = {
   wocId: string;
@@ -52,25 +34,8 @@ type SubmissionRecord = {
 
 const DEFAULT_TO_EMAIL = 'Christophertroyhilton@gmail.com';
 
-const blank: WocData = {
-  workOrder: '',
-  partNumber: '',
-  revision: '',
-  customer: '',
-  quantity: '',
-  department: '',
-  operation: '',
-  process: '',
-  currentListedRate: '',
-  observedBaseline: '',
-  issueType: 'Incorrect Time / Rate',
-  correctionType: 'Incorrect Time / Rate',
-  category: '',
-  priority: 'Medium',
-  problemSummary: '',
-  requestedAction: '',
-  optionalNote: '',
-};
+const blank = blankWocData;
+
 
 const confirmationLabels = [
   'I confirm the work order number is correct.',
@@ -334,7 +299,7 @@ export default function Home() {
   } | null>(null);
   const [routerText, setRouterText] = useState('');
   const [showDraft, setShowDraft] = useState(false);
-  const [checks, setChecks] = useState<boolean[]>(Array(5).fill(false));
+  const [checks, setChecks] = useState<boolean[]>([...defaultConfirmations]);
   const [status, setStatus] = useState('');
   const [sending, setSending] = useState(false);
   const [history, setHistory] = useState<SubmissionRecord[]>([]);
@@ -342,25 +307,27 @@ export default function Home() {
   const [activeView, setActiveView] = useState<TaskView>('Home');
 
   const resetForNewCorrection = (nextView: TaskView = 'Capture') => {
-    setData(blank);
+    resetWocState({
+      setData,
+      setCurrentStep: () => setActiveView(nextView),
+      setConfirmations: setChecks,
+      setGeneratedOutputs: () => setShowDraft(false),
+    });
     setImageUrl('');
     setSelectedFileName('');
     setSelectedImageFile(null);
     setRouterText('');
-    setShowDraft(false);
-    setChecks(Array(5).fill(false));
     setStatus('');
     setSending(false);
     setVisionDebugMessage('');
     setLastVisionResult(null);
     if (takePhotoInputRef.current) takePhotoInputRef.current.value = '';
     if (uploadInputRef.current) uploadInputRef.current.value = '';
-    setActiveView(nextView);
   };
 
   const setField = (field: keyof WocData, value: string) => {
     setData((current) => ({ ...current, [field]: value }));
-    setChecks(Array(5).fill(false));
+    setChecks([...defaultConfirmations]);
   };
 
   const loadSample = () => {
@@ -384,7 +351,7 @@ export default function Home() {
       optionalNote: '',
     });
     setShowDraft(false);
-    setChecks(Array(5).fill(false));
+    setChecks([...defaultConfirmations]);
     setStatus('Sample welding time issue loaded.');
   };
 
@@ -399,7 +366,7 @@ export default function Home() {
     }
 
     setData((current) => extractRouterData(routerText, current));
-    setChecks(Array(5).fill(false));
+    setChecks([...defaultConfirmations]);
     setStatus('Router text extracted. Verify every field before generating the draft.');
   };
 
@@ -447,7 +414,7 @@ export default function Home() {
 
       const extracted = extractRouterData(text, data);
       setData(extracted);
-      setChecks(Array(5).fill(false));
+      setChecks([...defaultConfirmations]);
       setStatus('Text extracted from photo. Review fields before sending.');
     } catch (_error) {
       setStatus('Could not read enough text from this photo. Try a clearer photo or enter fields manually.');
@@ -491,7 +458,7 @@ export default function Home() {
         customer: result.customer || current.customer,
         quantity: result.quantity || current.quantity,
       }));
-      setChecks(Array(5).fill(false));
+      setChecks([...defaultConfirmations]);
       setLastVisionResult({
         workOrder: result.workOrder || '',
         partNumber: result.partNumber || result.cadDrawing || '',
@@ -565,7 +532,7 @@ export default function Home() {
       };
     });
     setShowDraft(false);
-    setChecks(Array(5).fill(false));
+    setChecks([...defaultConfirmations]);
     setStatus(`${typeName} selected. You can edit any field.`);
   };
 
@@ -754,7 +721,7 @@ ${emailBody}`;
 
   const generateDraft = () => {
     setShowDraft(true);
-    setChecks(Array(5).fill(false));
+    setChecks([...defaultConfirmations]);
     setActiveView('Drafts');
     setStatus(readyToDraft ? 'Draft generated. Confirm every checkbox before sending.' : 'Draft generated with missing fields. Fill bracketed items before confirming.');
   };
