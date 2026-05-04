@@ -79,14 +79,9 @@ body {
 .brand-tile img { opacity: 0; }
 
 .home-system-icon {
-  content: var(--rc-main-icon);
   display: block;
   object-fit: contain;
   background-color: rgba(10, 12, 18, 0.32);
-  background-image: var(--rc-main-icon);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
   box-shadow:
     0 18px 42px rgba(0, 0, 0, 0.44),
     0 0 34px rgba(75, 141, 255, 0.2),

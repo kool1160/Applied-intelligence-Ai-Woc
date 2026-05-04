@@ -60,6 +60,19 @@
   transform: none;
 }
 
+/* PR #82 label protection: keep five dock labels on one line on iPhone widths. */
+.bottom-nav .nav-label,
+.bottom-nav button > span:last-child {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1;
+}
+
 .bottom-nav button:hover,
 .bottom-nav button:active {
   transform: none;
@@ -129,6 +142,12 @@
     grid-template-rows: 27px 1fr;
     border-radius: 17px;
     font-size: 9.5px;
+  }
+
+  .bottom-nav .nav-label,
+  .bottom-nav button > span:last-child {
+    font-size: 9px;
+    letter-spacing: 0;
   }
 
   .bottom-nav .glass-icon-tile,

@@ -89,6 +89,86 @@ select,
   max-width: calc(100vw - 12px);
 }
 
+/* PR #82 conflict resolution: keep the approved compact Home layout without replacing the real img logo. */
+#home:has(.home-system-hero) {
+  padding-bottom: 238px;
+  scroll-padding-bottom: 238px;
+}
+
+#home .home-system-hero {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 14px;
+  min-height: unset;
+  padding: 18px 16px 14px;
+  margin-top: 10px;
+  border-radius: 26px;
+}
+
+#home .home-system-hero::before {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  background-image: none !important;
+}
+
+#home .home-active-badge {
+  padding: 6px 11px;
+  font-size: 10.5px;
+}
+
+#home .home-system-icon {
+  display: block !important;
+  width: clamp(124px, 34vw, 168px);
+  height: auto !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  text-indent: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+#home .home-system-copy h2 {
+  font-size: clamp(25px, 7.2vw, 34px);
+  line-height: 1.04;
+}
+
+#home .home-system-copy p {
+  margin-top: 6px;
+  font-size: clamp(14px, 3.9vw, 17px);
+}
+
+#home .home-workflow {
+  margin-top: 10px;
+  padding: 10px 12px 6px;
+  border-radius: 24px;
+}
+
+#home .home-workflow-row {
+  padding: 9px 10px;
+}
+
+#home .home-workflow-row h3 {
+  font-size: 16px;
+}
+
+#home .home-start-button {
+  min-height: 62px;
+  margin-top: 2px;
+}
+
+#home .home-start-button strong {
+  font-size: 17px;
+}
+
 @media (max-width: 620px) {
   #__next,
   .shell,
@@ -114,58 +194,56 @@ select,
   .workflow-row {
     width: 100%;
   }
-}
 
-/* Final Home hero logo lock
-   Scope: hero logo rendering only. Uses the fitted REFAB Connect neon logo and sits in the last imported stylesheet so earlier icon/theme files cannot override it. */
-:root {
-  --rc-main-icon: url('/refab-connect-master-1024.png?v=task-001') !important;
-}
-
-#home .home-system-hero {
-  display: grid !important;
-  justify-items: center !important;
-  text-align: center !important;
-}
-
-#home .home-system-hero::before {
-  content: '' !important;
-  display: block !important;
-  width: clamp(190px, 58vw, 320px) !important;
-  max-width: 100% !important;
-  aspect-ratio: 1 / 1 !important;
-  margin: 0 auto clamp(14px, 3vw, 18px) !important;
-  background-image: var(--rc-main-icon) !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-  background-size: contain !important;
-  filter:
-    drop-shadow(0 18px 36px rgba(0, 0, 0, 0.48))
-    drop-shadow(0 0 22px rgba(75, 141, 255, 0.2))
-    drop-shadow(0 0 26px rgba(209, 50, 57, 0.18)) !important;
-}
-
-#home .home-system-icon {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  max-width: 0 !important;
-  min-width: 0 !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-@media (min-width: 768px) and (max-width: 1400px) {
-  #home .home-system-hero::before {
-    width: clamp(150px, 27vw, 198px) !important;
-    margin-bottom: 14px !important;
+  #home:has(.home-system-hero) {
+    padding-bottom: 248px;
+    scroll-padding-bottom: 248px;
   }
-}
 
-@media (max-width: 620px) {
-  #home .home-system-hero::before {
-    width: clamp(185px, 68vw, 270px) !important;
-    margin-bottom: 14px !important;
+  #home .home-system-hero {
+    padding: 14px 12px 12px;
+    gap: 10px;
+    margin-top: 6px;
+    border-radius: 20px;
+  }
+
+  #home .home-active-badge {
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+
+  #home .home-system-icon {
+    width: clamp(104px, 31vw, 134px);
+    border-radius: 14px;
+  }
+
+  #home .home-system-copy h2 {
+    font-size: clamp(21px, 7vw, 28px);
+  }
+
+  #home .home-system-copy p {
+    font-size: clamp(12px, 3.6vw, 14px);
+  }
+
+  #home .home-workflow {
+    margin-top: 8px;
+    padding: 8px 10px 4px;
+  }
+
+  #home .home-workflow-row {
+    padding: 7px 8px;
+  }
+
+  #home .home-workflow-row h3 {
+    font-size: 15px;
+  }
+
+  #home .home-start-button {
+    min-height: 54px;
+    margin-top: 0;
+  }
+
+  #home .home-start-button strong {
+    font-size: 15px;
   }
 }
