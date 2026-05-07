@@ -52,16 +52,63 @@
   margin: 12px 0 0;
   padding: 0;
   list-style: none;
+  display: grid;
+  gap: 10px;
 }
 
 .history-list li {
-  margin-top: 10px;
-  padding: 12px;
+  margin-top: 0;
+  padding: 13px 14px;
   border-radius: 14px;
   border: 1px solid rgba(206, 213, 221, 0.24);
-  background: rgba(13, 16, 21, 0.78);
+  background: linear-gradient(145deg, rgba(31, 35, 42, 0.75), rgba(12, 14, 18, 0.85));
   color: var(--muted);
   font-weight: 750;
+  display: grid;
+  gap: 6px;
+}
+
+.history-list li strong {
+  color: var(--soft-blue);
+}
+
+.history-list li span {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.history-intro {
+  margin: 0;
+}
+
+.history-empty-state {
+  margin-top: 12px;
+  text-align: left;
+}
+
+.history-panel,
+.more-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.more-group {
+  margin: 0;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(206, 213, 221, 0.24);
+  background: linear-gradient(145deg, rgba(31, 35, 42, 0.75), rgba(12, 14, 18, 0.85));
+}
+
+.more-group-title {
+  margin: 0 0 8px;
+  color: var(--soft-blue);
+  font-size: 16px;
+  letter-spacing: 0.01em;
+}
+
+.more-group p {
+  margin: 0;
 }
 
 .capture-panel textarea {
